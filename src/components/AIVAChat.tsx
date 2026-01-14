@@ -6,13 +6,36 @@ import {
   X,
   Send,
   Phone,
+  PhoneOff,
   Calendar,
   Home,
   Sparkles,
   Bot,
   User,
   Minimize2,
+  BedDouble,
+  Bath,
+  Square,
+  MapPin,
+  Clock,
+  CheckCircle,
+  Volume2,
 } from "lucide-react";
+
+// Retell types
+declare global {
+  interface Window {
+    Retell: {
+      RetellWebClient: new () => RetellWebClient;
+    };
+  }
+}
+
+interface RetellWebClient {
+  startCall(config: { accessToken: string }): Promise<void>;
+  stopCall(): void;
+  on(event: string, callback: (data?: unknown) => void): void;
+}
 
 interface Message {
   id: number;
@@ -20,7 +43,54 @@ interface Message {
   text: string;
   time: string;
   options?: string[];
+  listings?: typeof mockListings;
+  calendar?: boolean;
+  callStarted?: boolean;
 }
+
+// Mock listings data
+const mockListings = [
+  {
+    id: 1,
+    title: "Modern Lakefront Estate",
+    address: "123 Lakeview Drive",
+    price: 1250000,
+    beds: 5,
+    baths: 4,
+    sqft: 4200,
+    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&q=80",
+    tag: "New Listing",
+  },
+  {
+    id: 2,
+    title: "Downtown Luxury Penthouse",
+    address: "456 Main Street",
+    price: 895000,
+    beds: 3,
+    baths: 2,
+    sqft: 2100,
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80",
+    tag: "Featured",
+  },
+  {
+    id: 3,
+    title: "Charming Colonial Home",
+    address: "789 Oak Street",
+    price: 675000,
+    beds: 4,
+    baths: 3,
+    sqft: 2800,
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80",
+    tag: "Open House",
+  },
+];
+
+// Mock available times
+const mockTimes = [
+  { date: "Tomorrow", slots: ["10:00 AM", "2:00 PM", "4:30 PM"] },
+  { date: "Wednesday", slots: ["9:00 AM", "11:30 AM", "3:00 PM"] },
+  { date: "Thursday", slots: ["10:00 AM", "1:00 PM", "5:00 PM"] },
+];
 
 const initialMessages: Message[] = [
   {
@@ -37,7 +107,7 @@ const initialMessages: Message[] = [
   },
 ];
 
-const aiResponses: { [key: string]: { text: string; options?: string[] } } = {
+const aiResponses: { [key: string]: { text: string; options?: string[]; listings?: typeof mockListings; calendar?: boolean } } = {
   "i'm looking to buy a home": {
     text: "That's exciting! I'd love to help you find your dream home. To give you the best recommendations, could you tell me what area you're interested in and your budget range?",
     options: ["Under $400K", "$400K - $600K", "$600K - $1M", "Over $1M"],
@@ -47,8 +117,8 @@ const aiResponses: { [key: string]: { text: string; options?: string[] } } = {
     options: ["Get home valuation", "Talk to an agent", "Learn about selling process"],
   },
   "schedule a showing": {
-    text: "I'd be happy to schedule a showing for you! Which property are you interested in? Or I can show you our featured listings and help you pick.",
-    options: ["View featured listings", "I have an address", "Show available times"],
+    text: "I'd be happy to schedule a showing for you! Here are some available time slots. Pick one that works best for you:",
+    calendar: true,
   },
   "get a home valuation": {
     text: "Great choice! Our AI valuation is 98% accurate and completely free. Just tell me your property address and I'll have your estimate in seconds.",
@@ -70,10 +140,42 @@ const aiResponses: { [key: string]: { text: string; options?: string[] } } = {
     text: "You're looking at our premium collection! We have exclusive access to 28 luxury properties, including estates and waterfront homes. Would you like a private showing with our luxury specialist?",
     options: ["View luxury collection", "Private showing", "Talk to specialist"],
   },
+  "show top picks": {
+    text: "Here are our top-rated properties that match your criteria. Each one has been hand-selected based on value, location, and features:",
+    listings: mockListings,
+  },
+  "show me options": {
+    text: "Here are some stunning homes in your price range. I've selected these based on the best value and most popular features:",
+    listings: mockListings,
+  },
+  "show luxury homes": {
+    text: "Here's our curated collection of luxury properties. These homes feature premium finishes, smart home technology, and prime locations:",
+    listings: mockListings,
+  },
+  "view luxury collection": {
+    text: "Our luxury collection features the finest estates in the area. Here are three standout properties:",
+    listings: mockListings,
+  },
+  "view featured listings": {
+    text: "Here are our featured listings - these properties are getting a lot of attention! Let me know if any catch your eye:",
+    listings: mockListings,
+  },
+  "schedule tours": {
+    text: "Great idea! Let me show you our available time slots. Pick a time that works for you and I'll confirm your showing:",
+    calendar: true,
+  },
   default: {
     text: "Thanks for your interest! I can help you with buying, selling, scheduling showings, or getting a home valuation. What would you like to explore?",
     options: ["Buy a home", "Sell my home", "Schedule showing", "Home valuation"],
   },
+};
+
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(price);
 };
 
 export default function AIVAChat() {
@@ -85,7 +187,48 @@ export default function AIVAChat() {
   const [showBubble, setShowBubble] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-open after 5 seconds
+  // Retell state
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [retellClient, setRetellClient] = useState<RetellWebClient | null>(null);
+
+  // Load Retell SDK
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.retellai.com/retell-web-sdk/retell-web-sdk.min.js";
+    script.async = true;
+    script.onload = () => {
+      if (window.Retell) {
+        const client = new window.Retell.RetellWebClient();
+
+        client.on("call_started", () => {
+          setIsCallActive(true);
+          setIsConnecting(false);
+        });
+
+        client.on("call_ended", () => {
+          setIsCallActive(false);
+          setIsConnecting(false);
+        });
+
+        client.on("error", () => {
+          setIsCallActive(false);
+          setIsConnecting(false);
+        });
+
+        setRetellClient(client);
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  // Auto-open after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!isOpen) {
@@ -102,6 +245,78 @@ export default function AIVAChat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const startCall = async () => {
+    if (!retellClient) {
+      // Show error in chat
+      const errorMessage: Message = {
+        id: messages.length + 1,
+        sender: "ai",
+        text: "I'm sorry, the voice call system isn't ready yet. Please try again in a moment or use the chat instead!",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      return;
+    }
+
+    setIsConnecting(true);
+
+    try {
+      const response = await fetch("/api/retell/web-call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to start call");
+      }
+
+      await retellClient.startCall({
+        accessToken: data.data.access_token,
+      });
+
+      // Add call started message
+      const callMessage: Message = {
+        id: messages.length + 1,
+        sender: "ai",
+        text: "Connected! I'm now listening. Go ahead and tell me what you're looking for, and I'll help you find the perfect property.",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        callStarted: true,
+      };
+      setMessages((prev) => [...prev, callMessage]);
+    } catch (err) {
+      console.error("Error starting call:", err);
+      setIsConnecting(false);
+
+      const errorMessage: Message = {
+        id: messages.length + 1,
+        sender: "ai",
+        text: "I couldn't start the voice call right now. This might be because voice calling isn't set up yet. Would you like to continue chatting instead?",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        options: ["Yes, let's chat", "Try call again"],
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
+  };
+
+  const endCall = () => {
+    if (retellClient) {
+      retellClient.stopCall();
+    }
+    setIsCallActive(false);
+
+    const endMessage: Message = {
+      id: messages.length + 1,
+      sender: "ai",
+      text: "Call ended. Thanks for chatting with me! Is there anything else I can help you with?",
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      options: ["Schedule a showing", "View listings", "Get home valuation"],
+    };
+    setMessages((prev) => [...prev, endMessage]);
+  };
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -135,6 +350,8 @@ export default function AIVAChat() {
         text: response.text,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         options: response.options,
+        listings: response.listings,
+        calendar: response.calendar,
       };
 
       setIsTyping(false);
@@ -144,6 +361,66 @@ export default function AIVAChat() {
 
   const handleOptionClick = (option: string) => {
     handleSendMessage(option);
+  };
+
+  const handleTimeSelect = (date: string, time: string) => {
+    const userMessage: Message = {
+      id: messages.length + 1,
+      sender: "user",
+      text: `${date} at ${time}`,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setIsTyping(true);
+
+    setTimeout(() => {
+      const confirmMessage: Message = {
+        id: messages.length + 2,
+        sender: "ai",
+        text: `Perfect! I've reserved ${date} at ${time} for your showing. You'll receive a confirmation email shortly with all the details. Is there anything else I can help you with?`,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        options: ["View more listings", "Get directions", "That's all, thanks!"],
+      };
+      setIsTyping(false);
+      setMessages((prev) => [...prev, confirmMessage]);
+    }, 1500);
+  };
+
+  const handleListingClick = (listing: typeof mockListings[0]) => {
+    const userMessage: Message = {
+      id: messages.length + 1,
+      sender: "user",
+      text: `Tell me more about ${listing.title}`,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setIsTyping(true);
+
+    setTimeout(() => {
+      const detailMessage: Message = {
+        id: messages.length + 2,
+        sender: "ai",
+        text: `Great choice! ${listing.title} at ${listing.address} is a stunning ${listing.beds}-bedroom, ${listing.baths}-bathroom home with ${listing.sqft.toLocaleString()} sq ft of living space. Listed at ${formatPrice(listing.price)}, this property features modern amenities and is in a highly sought-after location. Would you like to schedule a showing?`,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        options: ["Schedule a showing", "See similar homes", "Get more details"],
+      };
+      setIsTyping(false);
+      setMessages((prev) => [...prev, detailMessage]);
+    }, 1500);
+  };
+
+  const handleQuickAction = (action: string) => {
+    if (action === "call") {
+      if (isCallActive) {
+        endCall();
+      } else {
+        startCall();
+      }
+    } else if (action === "schedule") {
+      handleSendMessage("Schedule a showing");
+    } else if (action === "listings") {
+      handleSendMessage("View featured listings");
+    }
   };
 
   return (
@@ -198,7 +475,7 @@ export default function AIVAChat() {
 
       {/* Chat Window */}
       {isOpen && !isMinimized && (
-        <div className="fixed bottom-28 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col" style={{ height: "550px" }}>
+        <div className="fixed bottom-28 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col" style={{ height: "600px" }}>
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -225,19 +502,65 @@ export default function AIVAChat() {
 
           {/* Quick Actions */}
           <div className="flex items-center space-x-2 p-3 bg-gray-50 border-b">
-            <button className="flex items-center space-x-1 px-3 py-1.5 bg-white rounded-full text-sm text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors border border-gray-200">
-              <Phone className="w-4 h-4" />
-              <span>Call</span>
+            <button
+              onClick={() => handleQuickAction("call")}
+              disabled={isConnecting}
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm transition-colors border ${
+                isCallActive
+                  ? "bg-red-100 text-red-600 border-red-200 hover:bg-red-200"
+                  : isConnecting
+                  ? "bg-yellow-100 text-yellow-600 border-yellow-200"
+                  : "bg-white text-gray-600 border-gray-200 hover:bg-emerald-50 hover:text-emerald-600"
+              }`}
+            >
+              {isCallActive ? (
+                <>
+                  <PhoneOff className="w-4 h-4" />
+                  <span>End Call</span>
+                </>
+              ) : isConnecting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
+                  <span>Connecting...</span>
+                </>
+              ) : (
+                <>
+                  <Phone className="w-4 h-4" />
+                  <span>Call</span>
+                </>
+              )}
             </button>
-            <button className="flex items-center space-x-1 px-3 py-1.5 bg-white rounded-full text-sm text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors border border-gray-200">
+            <button
+              onClick={() => handleQuickAction("schedule")}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-white rounded-full text-sm text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors border border-gray-200"
+            >
               <Calendar className="w-4 h-4" />
               <span>Schedule</span>
             </button>
-            <button className="flex items-center space-x-1 px-3 py-1.5 bg-white rounded-full text-sm text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors border border-gray-200">
+            <button
+              onClick={() => handleQuickAction("listings")}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-white rounded-full text-sm text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors border border-gray-200"
+            >
               <Home className="w-4 h-4" />
               <span>Listings</span>
             </button>
           </div>
+
+          {/* Active Call Indicator */}
+          {isCallActive && (
+            <div className="bg-green-50 border-b border-green-100 px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Volume2 className="w-5 h-5 text-green-600 animate-pulse" />
+                <span className="text-sm font-medium text-green-700">Voice call active - AIVA is listening</span>
+              </div>
+              <button
+                onClick={endCall}
+                className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+              >
+                <PhoneOff className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
@@ -276,8 +599,99 @@ export default function AIVAChat() {
                   )}
                 </div>
 
+                {/* Property Cards */}
+                {message.sender === "ai" && message.listings && (
+                  <div className="mt-3 ml-10 space-y-3">
+                    {message.listings.map((listing) => (
+                      <div
+                        key={listing.id}
+                        onClick={() => handleListingClick(listing)}
+                        className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-all"
+                      >
+                        <div className="flex">
+                          <div className="w-24 h-24 flex-shrink-0">
+                            <img
+                              src={listing.image}
+                              alt={listing.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 p-3">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h4 className="font-semibold text-gray-900 text-sm leading-tight">{listing.title}</h4>
+                                <div className="flex items-center text-gray-500 text-xs mt-0.5">
+                                  <MapPin className="w-3 h-3 mr-0.5" />
+                                  {listing.address}
+                                </div>
+                              </div>
+                              <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
+                                {listing.tag}
+                              </span>
+                            </div>
+                            <p className="text-emerald-600 font-bold text-sm mt-1">{formatPrice(listing.price)}</p>
+                            <div className="flex items-center space-x-3 mt-1 text-gray-500 text-xs">
+                              <span className="flex items-center">
+                                <BedDouble className="w-3 h-3 mr-0.5" />
+                                {listing.beds}
+                              </span>
+                              <span className="flex items-center">
+                                <Bath className="w-3 h-3 mr-0.5" />
+                                {listing.baths}
+                              </span>
+                              <span className="flex items-center">
+                                <Square className="w-3 h-3 mr-0.5" />
+                                {listing.sqft.toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Calendar/Scheduling */}
+                {message.sender === "ai" && message.calendar && (
+                  <div className="mt-3 ml-10 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Calendar className="w-5 h-5 text-emerald-600" />
+                      <span className="font-semibold text-gray-900">Available Times</span>
+                    </div>
+                    <div className="space-y-3">
+                      {mockTimes.map((day) => (
+                        <div key={day.date}>
+                          <p className="text-xs font-medium text-gray-500 mb-1.5 flex items-center">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {day.date}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {day.slots.map((slot) => (
+                              <button
+                                key={slot}
+                                onClick={() => handleTimeSelect(day.date, slot)}
+                                className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm rounded-lg hover:bg-emerald-100 transition-colors font-medium"
+                              >
+                                {slot}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Call Started Indicator */}
+                {message.sender === "ai" && message.callStarted && (
+                  <div className="mt-2 ml-10 flex items-center space-x-2 text-green-600 text-sm">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Voice call connected</span>
+                  </div>
+                )}
+
                 {/* Quick Reply Options */}
-                {message.sender === "ai" && message.options && (
+                {message.sender === "ai" && message.options && !message.listings && !message.calendar && (
                   <div className="flex flex-wrap gap-2 mt-3 ml-10">
                     {message.options.map((option) => (
                       <button
