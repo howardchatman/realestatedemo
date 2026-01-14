@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Use service role for webhook (server-side)
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+// Use service role for webhook (server-side) - only create client if keys are available
+let supabase: SupabaseClient | null = null;
+if (supabaseUrl && supabaseServiceKey) {
+  supabase = createClient(supabaseUrl, supabaseServiceKey);
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // If Supabase isn't configured, just acknowledge the webhook
+    if (!supabase) {
+      console.log('Retell webhook received but Supabase service key not configured');
+      return NextResponse.json({ success: true, message: 'Webhook received (database not configured)' });
+    }
+
     const body = await request.json();
 
     // Retell sends various webhook events
