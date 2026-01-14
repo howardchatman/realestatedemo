@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Phone, Mail, MapPin, Clock, Send, Calendar, Check } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, Check } from "lucide-react";
+import CallButton from "./CallButton";
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -12,21 +13,44 @@ export default function ContactSection() {
     preferredContact: "email",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    // Reset after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-        preferredContact: "email",
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message,
+          preferredContact: formData.preferredContact,
+          source: "contact_form",
+        }),
       });
-    }, 3000);
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        setTimeout(() => {
+          setIsSubmitted(false);
+          setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            message: "",
+            preferredContact: "email",
+          });
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -44,19 +68,16 @@ export default function ContactSection() {
 
             {/* Contact Methods */}
             <div className="space-y-6 mb-8">
-              <a
-                href="tel:+15551234567"
-                className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-emerald-50 transition-colors group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-200 transition-colors">
+              <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
                   <Phone className="w-6 h-6 text-emerald-600" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Call Us</h3>
-                  <p className="text-emerald-600 font-medium">(555) 123-4567</p>
-                  <p className="text-gray-500 text-sm">Available 24/7 with instant AI response</p>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Talk to AI Assistant</h3>
+                  <p className="text-gray-500 text-sm mb-3">Available 24/7 with instant AI response</p>
+                  <CallButton variant="default" />
                 </div>
-              </a>
+              </div>
 
               <a
                 href="mailto:hello@chatmanrealestate.com"
@@ -240,10 +261,20 @@ export default function ContactSection() {
 
                   <button
                     type="submit"
-                    className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
+                    disabled={isSubmitting}
+                    className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-emerald-500/25 transition-all disabled:opacity-70"
                   >
-                    <Send className="w-5 h-5" />
-                    <span>Send Message</span>
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5" />
+                        <span>Send Message</span>
+                      </>
+                    )}
                   </button>
                 </form>
               )}
