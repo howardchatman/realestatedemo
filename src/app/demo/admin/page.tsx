@@ -25,6 +25,8 @@ import {
   ChevronDown,
   Download,
   Filter,
+  Menu,
+  X,
 } from "lucide-react";
 
 // Mock data for listings
@@ -140,28 +142,36 @@ const getLeadStatusBadge = (status: string) => {
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Hamburger Menu - Mobile Only */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <Link href="/" className="flex items-center space-x-2 text-gray-600 hover:text-emerald-600 transition-colors">
               <ArrowLeft className="w-5 h-5" />
-              <span>Back to Site</span>
+              <span className="hidden sm:inline">Back to Site</span>
             </Link>
-            <div className="h-6 w-px bg-gray-200" />
-            <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Demo</span>
+            <div className="hidden sm:block h-6 w-px bg-gray-200" />
+            <h1 className="text-lg md:text-xl font-bold text-gray-900">Admin Dashboard</h1>
+            <span className="hidden sm:inline px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Demo</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="relative hidden md:block">
               <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-64"
+                className="pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48 lg:w-64"
               />
             </div>
             <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg relative">
@@ -175,13 +185,39 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)]">
-          <div className="p-4">
+        {/* Sidebar - Desktop: always visible, Mobile: slide-in drawer */}
+        <div className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          w-72 lg:w-64 bg-white border-r border-gray-200
+          transform transition-transform duration-300 ease-in-out
+          lg:transform-none lg:min-h-[calc(100vh-73px)]
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
+          <div className="p-4 h-full overflow-y-auto">
+            {/* Close button - Mobile Only */}
+            <div className="flex items-center justify-between lg:hidden mb-4">
+              <h2 className="font-bold text-gray-900">Menu</h2>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
             {sidebarItems.map((item) => (
               <button
                 key={item.name}
+                onClick={() => setSidebarOpen(false)}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg mb-1 transition-colors ${
                   item.active
                     ? "bg-emerald-50 text-emerald-700"
@@ -205,81 +241,108 @@ export default function AdminDashboard() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 md:p-6 overflow-x-hidden">
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <Home className="w-6 h-6 text-emerald-600" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+            <div className="bg-white rounded-xl p-3 md:p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2 md:mb-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <Home className="w-4 h-4 md:w-6 md:h-6 text-emerald-600" />
                 </div>
-                <span className="text-emerald-600 text-sm font-medium flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-1" /> +12%
+                <span className="text-emerald-600 text-xs md:text-sm font-medium flex items-center">
+                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-0.5 md:mr-1" /> +12%
                 </span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">24</h3>
-              <p className="text-gray-500 text-sm">Active Listings</p>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">24</h3>
+              <p className="text-gray-500 text-xs md:text-sm">Active Listings</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+            <div className="bg-white rounded-xl p-3 md:p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2 md:mb-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-blue-100 flex items-center justify-center">
+                  <Users className="w-4 h-4 md:w-6 md:h-6 text-blue-600" />
                 </div>
-                <span className="text-emerald-600 text-sm font-medium flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-1" /> +28%
+                <span className="text-emerald-600 text-xs md:text-sm font-medium flex items-center">
+                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-0.5 md:mr-1" /> +28%
                 </span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">47</h3>
-              <p className="text-gray-500 text-sm">New Leads This Week</p>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">47</h3>
+              <p className="text-gray-500 text-xs md:text-sm">New Leads</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-                  <Phone className="w-6 h-6 text-purple-600" />
+            <div className="bg-white rounded-xl p-3 md:p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2 md:mb-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-purple-100 flex items-center justify-center">
+                  <Phone className="w-4 h-4 md:w-6 md:h-6 text-purple-600" />
                 </div>
-                <span className="text-emerald-600 text-sm font-medium flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-1" /> +45%
+                <span className="text-emerald-600 text-xs md:text-sm font-medium flex items-center">
+                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-0.5 md:mr-1" /> +45%
                 </span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">156</h3>
-              <p className="text-gray-500 text-sm">AI Calls Handled</p>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">156</h3>
+              <p className="text-gray-500 text-xs md:text-sm">AI Calls</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-orange-600" />
+            <div className="bg-white rounded-xl p-3 md:p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2 md:mb-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-orange-100 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 md:w-6 md:h-6 text-orange-600" />
                 </div>
-                <span className="text-emerald-600 text-sm font-medium flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-1" /> +8%
+                <span className="text-emerald-600 text-xs md:text-sm font-medium flex items-center">
+                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-0.5 md:mr-1" /> +8%
                 </span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">12</h3>
-              <p className="text-gray-500 text-sm">Showings Scheduled</p>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">12</h3>
+              <p className="text-gray-500 text-xs md:text-sm">Showings</p>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Listings Table */}
             <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-6 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900">Property Listings</h2>
+              <div className="p-4 md:p-6 border-b border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <h2 className="text-base md:text-lg font-bold text-gray-900">Property Listings</h2>
                   <div className="flex items-center space-x-2">
-                    <button className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg text-sm">
+                    <button className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1.5 md:py-2 text-gray-600 hover:bg-gray-50 rounded-lg text-xs md:text-sm">
                       <Filter className="w-4 h-4" />
                       <span>Filter</span>
                     </button>
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors">
+                    <button className="flex items-center space-x-1 md:space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-emerald-500 text-white rounded-lg text-xs md:text-sm font-medium hover:bg-emerald-600 transition-colors">
                       <Plus className="w-4 h-4" />
-                      <span>Add Listing</span>
+                      <span>Add</span>
                     </button>
                   </div>
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              {/* Mobile Card View */}
+              <div className="md:hidden divide-y divide-gray-100">
+                {mockListings.map((listing) => (
+                  <div key={listing.id} className="p-4 hover:bg-gray-50">
+                    <div className="flex items-start space-x-3">
+                      <img src={listing.image} alt={listing.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="font-medium text-gray-900 text-sm truncate">{listing.title}</p>
+                            <p className="text-xs text-gray-500 truncate">{listing.address}</p>
+                          </div>
+                          {getStatusBadge(listing.status)}
+                        </div>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="font-semibold text-gray-900 text-sm">{formatPrice(listing.price)}</span>
+                          <div className="flex items-center space-x-1 text-gray-500 text-xs">
+                            <Eye className="w-3 h-3" />
+                            <span>{listing.views}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
@@ -331,26 +394,26 @@ export default function AdminDashboard() {
 
             {/* Recent Leads */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-4 md:p-6 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900">Recent Leads</h2>
-                  <button className="text-emerald-600 text-sm font-medium hover:text-emerald-700">View All</button>
+                  <h2 className="text-base md:text-lg font-bold text-gray-900">Recent Leads</h2>
+                  <button className="text-emerald-600 text-xs md:text-sm font-medium hover:text-emerald-700">View All</button>
                 </div>
               </div>
               <div className="divide-y divide-gray-100">
                 {mockLeads.slice(0, 5).map((lead) => (
-                  <div key={lead.id} className="p-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-600 font-medium text-sm">
+                  <div key={lead.id} className="p-3 md:p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-600 font-medium text-xs md:text-sm flex-shrink-0">
                           {lead.name.split(" ").map(n => n[0]).join("")}
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{lead.name}</p>
-                          <p className="text-xs text-gray-500">{lead.source} • {lead.date}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 text-sm truncate">{lead.name}</p>
+                          <p className="text-[10px] md:text-xs text-gray-500 truncate">{lead.source} • {lead.date}</p>
                         </div>
                       </div>
-                      {getLeadStatusBadge(lead.status)}
+                      <div className="flex-shrink-0">{getLeadStatusBadge(lead.status)}</div>
                     </div>
                   </div>
                 ))}
@@ -359,19 +422,19 @@ export default function AdminDashboard() {
           </div>
 
           {/* Recent AI Calls */}
-          <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center justify-between">
+          <div className="mt-4 md:mt-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="p-4 md:p-6 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-purple-600" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-purple-100 flex items-center justify-center">
+                    <Phone className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900">Recent AI Calls</h2>
-                    <p className="text-sm text-gray-500">Calls handled by AIVA</p>
+                    <h2 className="text-base md:text-lg font-bold text-gray-900">Recent AI Calls</h2>
+                    <p className="text-xs md:text-sm text-gray-500">Calls handled by AIVA</p>
                   </div>
                 </div>
-                <button className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg text-sm">
+                <button className="flex items-center space-x-2 px-3 py-1.5 md:py-2 text-gray-600 hover:bg-gray-50 rounded-lg text-xs md:text-sm self-start sm:self-auto">
                   <Download className="w-4 h-4" />
                   <span>Export</span>
                 </button>
@@ -379,27 +442,27 @@ export default function AdminDashboard() {
             </div>
             <div className="divide-y divide-gray-100">
               {mockCalls.map((call) => (
-                <div key={call.id} className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Phone className="w-5 h-5 text-gray-500" />
+                <div key={call.id} className="p-3 md:p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start md:items-center justify-between gap-2">
+                    <div className="flex items-center space-x-2 md:space-x-4">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <Phone className="w-4 h-4 md:w-5 md:h-5 text-gray-500" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{call.caller}</p>
-                        <p className="text-sm text-gray-500">{call.date}</p>
+                        <p className="font-medium text-gray-900 text-sm">{call.caller}</p>
+                        <p className="text-xs text-gray-500">{call.date}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <span className="text-sm text-gray-600">{call.duration}</span>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-1 sm:space-y-0 sm:space-x-4">
+                      <span className="text-xs md:text-sm text-gray-600">{call.duration}</span>
+                      <span className={`px-2 py-0.5 md:py-1 text-[10px] md:text-xs font-medium rounded-full ${
                         call.sentiment === "positive" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
                       }`}>
                         {call.sentiment}
                       </span>
                     </div>
                   </div>
-                  <p className="mt-2 text-sm text-gray-600 ml-14">{call.summary}</p>
+                  <p className="mt-2 text-xs md:text-sm text-gray-600 ml-10 md:ml-14">{call.summary}</p>
                 </div>
               ))}
             </div>

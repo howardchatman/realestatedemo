@@ -25,6 +25,8 @@ import {
   TrendingUp,
   Mail,
   Phone,
+  Menu,
+  X,
 } from "lucide-react";
 
 // Mock saved listings
@@ -112,27 +114,35 @@ const formatPrice = (price: number) => {
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("saved");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Hamburger Menu - Mobile Only */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <Link href="/" className="flex items-center space-x-2 text-gray-600 hover:text-emerald-600 transition-colors">
               <ArrowLeft className="w-5 h-5" />
-              <span>Back to Site</span>
+              <span className="hidden sm:inline">Back to Site</span>
             </Link>
-            <div className="h-6 w-px bg-gray-200" />
-            <h1 className="text-xl font-bold text-gray-900">My Dashboard</h1>
-            <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">Demo</span>
+            <div className="hidden sm:block h-6 w-px bg-gray-200" />
+            <h1 className="text-lg md:text-xl font-bold text-gray-900">My Dashboard</h1>
+            <span className="hidden sm:inline px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">Demo</span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
             </button>
-            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg relative">
+            <button className="hidden sm:block p-2 text-gray-600 hover:bg-gray-100 rounded-lg relative">
               <MessageSquare className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full text-white text-xs flex items-center justify-center">1</span>
             </button>
@@ -149,10 +159,35 @@ export default function UserDashboard() {
         </div>
       </div>
 
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)]">
-          <div className="p-4">
+        {/* Sidebar - Desktop: always visible, Mobile: slide-in drawer */}
+        <div className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          w-72 lg:w-64 bg-white border-r border-gray-200
+          transform transition-transform duration-300 ease-in-out
+          lg:transform-none lg:min-h-[calc(100vh-73px)]
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
+          <div className="p-4 h-full overflow-y-auto">
+            {/* Close button - Mobile Only */}
+            <div className="flex items-center justify-between lg:hidden mb-4">
+              <h2 className="font-bold text-gray-900">Menu</h2>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
             {/* User Card */}
             <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-4 mb-6 text-white">
               <div className="flex items-center space-x-3 mb-3">
@@ -173,6 +208,7 @@ export default function UserDashboard() {
             {sidebarItems.map((item) => (
               <button
                 key={item.name}
+                onClick={() => setSidebarOpen(false)}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg mb-1 transition-colors ${
                   item.active
                     ? "bg-emerald-50 text-emerald-700"
@@ -196,17 +232,17 @@ export default function UserDashboard() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 md:p-6 overflow-x-hidden">
           {/* Welcome Section */}
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 mb-8 text-white">
-            <div className="flex items-center justify-between">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 md:p-6 mb-6 md:mb-8 text-white">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold mb-2">Welcome back, Sarah!</h2>
-                <p className="text-white/80">You have 3 saved homes and 2 upcoming showings</p>
+                <h2 className="text-xl md:text-2xl font-bold mb-2">Welcome back, Sarah!</h2>
+                <p className="text-white/80 text-sm md:text-base">You have 3 saved homes and 2 upcoming showings</p>
               </div>
               <Link
                 href="/listings"
-                className="px-6 py-3 bg-white text-emerald-600 rounded-xl font-semibold hover:shadow-lg transition-all"
+                className="px-4 md:px-6 py-2 md:py-3 bg-white text-emerald-600 rounded-xl font-semibold hover:shadow-lg transition-all text-center text-sm md:text-base"
               >
                 Browse Listings
               </Link>
@@ -214,7 +250,7 @@ export default function UserDashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
             <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
@@ -261,12 +297,12 @@ export default function UserDashboard() {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Saved Homes */}
             <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-4 md:p-6 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900">Saved Homes</h2>
+                  <h2 className="text-base md:text-lg font-bold text-gray-900">Saved Homes</h2>
                   <button className="text-emerald-600 text-sm font-medium hover:text-emerald-700 flex items-center">
                     View All <ChevronRight className="w-4 h-4" />
                   </button>
@@ -274,52 +310,52 @@ export default function UserDashboard() {
               </div>
               <div className="divide-y divide-gray-100">
                 {savedListings.map((listing) => (
-                  <div key={listing.id} className="p-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start space-x-4">
-                      <div className="relative">
+                  <div key={listing.id} className="p-3 md:p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start space-x-3 md:space-x-4">
+                      <div className="relative flex-shrink-0">
                         <img
                           src={listing.image}
                           alt={listing.title}
-                          className="w-24 h-24 rounded-xl object-cover"
+                          className="w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover"
                         />
-                        <span className="absolute top-2 left-2 px-2 py-0.5 bg-emerald-500 text-white text-xs font-medium rounded-full">
+                        <span className="absolute top-1 left-1 md:top-2 md:left-2 px-1.5 md:px-2 py-0.5 bg-emerald-500 text-white text-[10px] md:text-xs font-medium rounded-full">
                           {listing.tag}
                         </span>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-semibold text-gray-900">{listing.title}</h3>
-                            <div className="flex items-center text-gray-500 text-sm mt-1">
-                              <MapPin className="w-4 h-4 mr-1" />
-                              {listing.address}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-gray-900 text-sm md:text-base truncate">{listing.title}</h3>
+                            <div className="flex items-center text-gray-500 text-xs md:text-sm mt-1">
+                              <MapPin className="w-3 h-3 md:w-4 md:h-4 mr-1 flex-shrink-0" />
+                              <span className="truncate">{listing.address}</span>
                             </div>
                           </div>
-                          <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
-                            <Heart className="w-5 h-5 fill-current" />
+                          <button className="p-1.5 md:p-2 text-red-500 hover:bg-red-50 rounded-lg flex-shrink-0">
+                            <Heart className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                           </button>
                         </div>
-                        <div className="flex items-center justify-between mt-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 md:mt-3 gap-2">
                           <div>
-                            <p className="text-lg font-bold text-emerald-600">{formatPrice(listing.price)}</p>
+                            <p className="text-base md:text-lg font-bold text-emerald-600">{formatPrice(listing.price)}</p>
                             {listing.priceChange && (
-                              <p className="text-xs text-green-600 flex items-center">
+                              <p className="text-[10px] md:text-xs text-green-600 flex items-center">
                                 <TrendingUp className="w-3 h-3 mr-1" />
                                 Price dropped {formatPrice(Math.abs(listing.priceChange))}
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center space-x-4 text-gray-500 text-sm">
+                          <div className="flex items-center space-x-3 md:space-x-4 text-gray-500 text-xs md:text-sm">
                             <span className="flex items-center">
-                              <BedDouble className="w-4 h-4 mr-1" />
+                              <BedDouble className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                               {listing.beds}
                             </span>
                             <span className="flex items-center">
-                              <Bath className="w-4 h-4 mr-1" />
+                              <Bath className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                               {listing.baths}
                             </span>
                             <span className="flex items-center">
-                              <Square className="w-4 h-4 mr-1" />
+                              <Square className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                               {listing.sqft.toLocaleString()}
                             </span>
                           </div>
@@ -430,28 +466,29 @@ export default function UserDashboard() {
           </div>
 
           {/* Contact Agent Card */}
-          <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xl font-bold">
+          <div className="mt-4 md:mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center space-x-3 md:space-x-4">
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
                   JC
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900">Your Agent: Jessica Chen</p>
-                  <p className="text-sm text-gray-500">Senior Real Estate Advisor</p>
-                  <div className="flex items-center space-x-4 mt-2">
-                    <a href="tel:+18327707998" className="flex items-center text-sm text-emerald-600 hover:text-emerald-700">
-                      <Phone className="w-4 h-4 mr-1" />
-                      (832) 770-7998
+                  <p className="font-bold text-gray-900 text-sm md:text-base">Your Agent: Jessica Chen</p>
+                  <p className="text-xs md:text-sm text-gray-500">Senior Real Estate Advisor</p>
+                  <div className="flex items-center space-x-3 md:space-x-4 mt-1 md:mt-2">
+                    <a href="tel:+18327707998" className="flex items-center text-xs md:text-sm text-emerald-600 hover:text-emerald-700">
+                      <Phone className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+                      <span className="hidden sm:inline">(832) 770-7998</span>
+                      <span className="sm:hidden">Call</span>
                     </a>
-                    <a href="mailto:jessica@chatmanrealestate.com" className="flex items-center text-sm text-emerald-600 hover:text-emerald-700">
-                      <Mail className="w-4 h-4 mr-1" />
+                    <a href="mailto:jessica@chatmanrealestate.com" className="flex items-center text-xs md:text-sm text-emerald-600 hover:text-emerald-700">
+                      <Mail className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                       Email
                     </a>
                   </div>
                 </div>
               </div>
-              <button className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-semibold hover:bg-emerald-600 transition-colors">
+              <button className="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 bg-emerald-500 text-white rounded-xl font-semibold hover:bg-emerald-600 transition-colors text-sm md:text-base">
                 Schedule a Call
               </button>
             </div>
