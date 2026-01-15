@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Menu, X, Phone, Search, Heart } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, Phone, Search, Heart, ChevronDown, LayoutDashboard, Users } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDemoDropdownOpen, setIsDemoDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +16,17 @@ export default function Navbar() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDemoDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const navLinks = [
@@ -56,6 +69,48 @@ export default function Navbar() {
                 {link.name}
               </a>
             ))}
+
+            {/* Demo Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsDemoDropdownOpen(!isDemoDropdownOpen)}
+                className="flex items-center space-x-1 text-gray-600 font-medium hover:text-emerald-600 transition-colors"
+              >
+                <span>Demo</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isDemoDropdownOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isDemoDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
+                  <Link
+                    href="/demo/admin"
+                    className="flex items-center space-x-3 px-4 py-3 hover:bg-emerald-50 transition-colors"
+                    onClick={() => setIsDemoDropdownOpen(false)}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                      <LayoutDashboard className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Admin Dashboard</p>
+                      <p className="text-xs text-gray-500">Manage listings & leads</p>
+                    </div>
+                  </Link>
+                  <Link
+                    href="/demo/user"
+                    className="flex items-center space-x-3 px-4 py-3 hover:bg-emerald-50 transition-colors"
+                    onClick={() => setIsDemoDropdownOpen(false)}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                      <Users className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">User Dashboard</p>
+                      <p className="text-xs text-gray-500">Saved homes & searches</p>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Actions */}
@@ -108,6 +163,28 @@ export default function Navbar() {
                   {link.name}
                 </a>
               ))}
+
+              {/* Mobile Demo Links */}
+              <div className="border-t border-gray-100 pt-4">
+                <p className="text-xs font-semibold text-gray-400 uppercase mb-3">Demo</p>
+                <Link
+                  href="/demo/admin"
+                  className="flex items-center space-x-3 py-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <LayoutDashboard className="w-5 h-5 text-purple-600" />
+                  <span className="text-gray-600 font-medium">Admin Dashboard</span>
+                </Link>
+                <Link
+                  href="/demo/user"
+                  className="flex items-center space-x-3 py-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Users className="w-5 h-5 text-emerald-600" />
+                  <span className="text-gray-600 font-medium">User Dashboard</span>
+                </Link>
+              </div>
+
               <hr className="my-2" />
               <a
                 href="tel:+18327707998"
