@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { RetellWebClient } from "retell-client-js-sdk";
 import {
   MessageSquare,
   X,
@@ -21,21 +22,6 @@ import {
   CheckCircle,
   Volume2,
 } from "lucide-react";
-
-// Retell types
-declare global {
-  interface Window {
-    Retell: {
-      RetellWebClient: new () => RetellWebClient;
-    };
-  }
-}
-
-interface RetellWebClient {
-  startCall(config: { accessToken: string }): Promise<void>;
-  stopCall(): void;
-  on(event: string, callback: (data?: unknown) => void): void;
-}
 
 interface Message {
   id: number;
@@ -192,39 +178,29 @@ export default function AIVAChat() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [retellClient, setRetellClient] = useState<RetellWebClient | null>(null);
 
-  // Load Retell SDK
+  // Initialize Retell SDK
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.retellai.com/retell-web-sdk/retell-web-sdk.min.js";
-    script.async = true;
-    script.onload = () => {
-      if (window.Retell) {
-        const client = new window.Retell.RetellWebClient();
+    const client = new RetellWebClient();
 
-        client.on("call_started", () => {
-          setIsCallActive(true);
-          setIsConnecting(false);
-        });
+    client.on("call_started", () => {
+      setIsCallActive(true);
+      setIsConnecting(false);
+    });
 
-        client.on("call_ended", () => {
-          setIsCallActive(false);
-          setIsConnecting(false);
-        });
+    client.on("call_ended", () => {
+      setIsCallActive(false);
+      setIsConnecting(false);
+    });
 
-        client.on("error", () => {
-          setIsCallActive(false);
-          setIsConnecting(false);
-        });
+    client.on("error", () => {
+      setIsCallActive(false);
+      setIsConnecting(false);
+    });
 
-        setRetellClient(client);
-      }
-    };
-    document.body.appendChild(script);
+    setRetellClient(client);
 
     return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
+      client.stopCall();
     };
   }, []);
 
