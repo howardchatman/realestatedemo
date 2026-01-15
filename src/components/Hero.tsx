@@ -1,10 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search, MapPin, Home, DollarSign, BedDouble, ChevronDown } from "lucide-react";
 
 export default function Hero() {
+  const router = useRouter();
   const [searchType, setSearchType] = useState<"buy" | "sell">("buy");
+  const [location, setLocation] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [priceRange, setPriceRange] = useState("");
+  const [bedrooms, setBedrooms] = useState("");
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (location) params.set("q", location);
+    if (propertyType) params.set("type", propertyType);
+    if (priceRange) params.set("price", priceRange);
+    if (bedrooms) params.set("beds", bedrooms);
+    router.push(`/listings${params.toString() ? `?${params.toString()}` : ""}`);
+  };
 
   return (
     <section className="relative min-h-[90vh] flex items-center">
@@ -64,6 +79,8 @@ export default function Hero() {
                   <input
                     type="text"
                     placeholder="Enter city, neighborhood, or ZIP code"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                     className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
@@ -72,44 +89,59 @@ export default function Hero() {
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="relative">
                     <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <select className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                      <option>Property Type</option>
-                      <option>House</option>
-                      <option>Condo</option>
-                      <option>Townhouse</option>
-                      <option>Multi-family</option>
+                    <select
+                      value={propertyType}
+                      onChange={(e) => setPropertyType(e.target.value)}
+                      className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="">Property Type</option>
+                      <option value="House">House</option>
+                      <option value="Condo">Condo</option>
+                      <option value="Townhouse">Townhouse</option>
+                      <option value="Multi-family">Multi-family</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
 
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <select className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                      <option>Price Range</option>
-                      <option>$200K - $400K</option>
-                      <option>$400K - $600K</option>
-                      <option>$600K - $800K</option>
-                      <option>$800K - $1M</option>
-                      <option>$1M+</option>
+                    <select
+                      value={priceRange}
+                      onChange={(e) => setPriceRange(e.target.value)}
+                      className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="">Price Range</option>
+                      <option value="200000-400000">$200K - $400K</option>
+                      <option value="400000-600000">$400K - $600K</option>
+                      <option value="600000-800000">$600K - $800K</option>
+                      <option value="800000-1000000">$800K - $1M</option>
+                      <option value="1000000-">$1M+</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
 
                   <div className="relative">
                     <BedDouble className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <select className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                      <option>Bedrooms</option>
-                      <option>1+</option>
-                      <option>2+</option>
-                      <option>3+</option>
-                      <option>4+</option>
-                      <option>5+</option>
+                    <select
+                      value={bedrooms}
+                      onChange={(e) => setBedrooms(e.target.value)}
+                      className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="">Bedrooms</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                      <option value="4">4+</option>
+                      <option value="5">5+</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
 
-                <button className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-emerald-500/25 transition-all">
+                <button
+                  onClick={handleSearch}
+                  className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
+                >
                   <Search className="w-5 h-5" />
                   <span>Search Properties</span>
                 </button>

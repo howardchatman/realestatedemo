@@ -14,31 +14,31 @@ import Link from "next/link";
 const footerLinks = {
   buying: [
     { name: "Search Homes", href: "/listings" },
-    { name: "Featured Properties", href: "#featured" },
+    { name: "Featured Properties", href: "/#featured" },
     { name: "New Listings", href: "/listings?filter=new" },
     { name: "Open Houses", href: "/listings?filter=openhouse" },
-    { name: "First Time Buyers", href: "#" },
+    { name: "First Time Buyers", href: "/listings" },
   ],
   selling: [
-    { name: "Free Home Valuation", href: "#valuation" },
-    { name: "Selling Process", href: "#" },
-    { name: "Market Analysis", href: "#" },
-    { name: "Pricing Strategy", href: "#" },
-    { name: "Home Staging Tips", href: "#" },
+    { name: "Free Home Valuation", href: "/#valuation" },
+    { name: "Selling Process", href: "/#valuation" },
+    { name: "Market Analysis", href: "/#valuation" },
+    { name: "Pricing Strategy", href: "/#valuation" },
+    { name: "Home Staging Tips", href: "/#contact" },
   ],
   company: [
-    { name: "About Us", href: "#about" },
-    { name: "Our Team", href: "#" },
-    { name: "Testimonials", href: "#testimonials" },
-    { name: "Contact Us", href: "#contact" },
-    { name: "Careers", href: "#" },
+    { name: "About Us", href: "/about" },
+    { name: "Our Team", href: "/about#team" },
+    { name: "Testimonials", href: "/#testimonials" },
+    { name: "Contact Us", href: "/#contact" },
+    { name: "Careers", href: "/about" },
   ],
   resources: [
-    { name: "Mortgage Calculator", href: "#" },
-    { name: "Buying Guide", href: "#" },
-    { name: "Selling Guide", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "FAQ", href: "#" },
+    { name: "Mortgage Calculator", href: "/#contact" },
+    { name: "Buying Guide", href: "/listings" },
+    { name: "Selling Guide", href: "/#valuation" },
+    { name: "Blog", href: "/about" },
+    { name: "FAQ", href: "/#contact" },
   ],
 };
 
@@ -194,8 +194,8 @@ export default function Footer() {
               <span>© {new Date().getFullYear()} Chatman Real Estate. All rights reserved.</span>
               <span className="hidden md:inline">•</span>
               <div className="flex items-center gap-4">
-                <a href="#" className="hover:text-emerald-400 transition-colors">Privacy Policy</a>
-                <a href="#" className="hover:text-emerald-400 transition-colors">Terms of Service</a>
+                <Link href="/privacy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms of Service</Link>
               </div>
             </div>
 

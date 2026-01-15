@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Heart, BedDouble, Bath, Square, MapPin, ArrowRight } from "lucide-react";
 
 const listings = [
@@ -108,13 +109,13 @@ export default function FeaturedListings() {
               Explore our handpicked selection of exceptional homes. Each property has been carefully curated to meet the highest standards.
             </p>
           </div>
-          <a
+          <Link
             href="/listings"
             className="mt-4 md:mt-0 inline-flex items-center space-x-2 text-emerald-600 font-semibold hover:text-emerald-700 transition-colors"
           >
             <span>View All Listings</span>
             <ArrowRight className="w-5 h-5" />
-          </a>
+          </Link>
         </div>
 
         {/* Listings Grid */}
@@ -185,9 +186,12 @@ export default function FeaturedListings() {
                 </div>
 
                 {/* View Details Button */}
-                <button className="w-full mt-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-emerald-500 hover:text-white transition-all">
+                <Link
+                  href={`/listings/${listing.id}`}
+                  className="w-full mt-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-emerald-500 hover:text-white transition-all block text-center"
+                >
                   View Details
-                </button>
+                </Link>
               </div>
             </div>
           ))}

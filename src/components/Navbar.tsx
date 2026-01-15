@@ -31,10 +31,10 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Buy", href: "/listings" },
-    { name: "Sell", href: "#valuation" },
-    { name: "Home Value", href: "#valuation" },
-    { name: "About", href: "#about" },
-    { name: "Contact", href: "#contact" },
+    { name: "Sell", href: "/#valuation" },
+    { name: "Home Value", href: "/#valuation" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/#contact" },
   ];
 
   return (
@@ -61,13 +61,13 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 className="text-gray-600 font-medium hover:text-emerald-600 transition-colors"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
 
             {/* Demo Dropdown */}
@@ -154,14 +154,14 @@ export default function Navbar() {
           <div className="lg:hidden bg-white rounded-2xl shadow-xl mt-2 p-6 absolute left-4 right-4 border border-gray-100">
             <div className="flex flex-col space-y-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   className="text-gray-600 hover:text-emerald-600 font-medium py-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
 
               {/* Mobile Demo Links */}
