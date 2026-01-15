@@ -9,11 +9,13 @@ import Testimonials from "@/components/Testimonials";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import AIVAChat from "@/components/AIVAChat";
+import LeadCaptureWrapper from "@/components/LeadCaptureWrapper";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
       <Navbar />
+      <LeadCaptureWrapper delay={5000} source="landing_page" />
       <Hero />
       <FeaturedListings />
       <HomeValuation />
