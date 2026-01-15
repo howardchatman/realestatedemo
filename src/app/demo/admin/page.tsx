@@ -77,13 +77,22 @@ const mockListings = [
   },
 ];
 
-// Mock data for leads
+// Mock data for leads with user account info
 const mockLeads = [
-  { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", source: "Web Chat", status: "new", date: "2 hours ago" },
-  { id: 2, name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", source: "Phone Call", status: "contacted", date: "5 hours ago" },
-  { id: 3, name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", source: "Contact Form", status: "qualified", date: "1 day ago" },
-  { id: 4, name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", source: "Home Valuation", status: "new", date: "1 day ago" },
-  { id: 5, name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", source: "Web Chat", status: "converted", date: "2 days ago" },
+  { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", source: "Lead Capture", status: "new", date: "2 hours ago", hasAccount: true, isVerified: false },
+  { id: 2, name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", source: "Phone Call", status: "contacted", date: "5 hours ago", hasAccount: true, isVerified: true },
+  { id: 3, name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", source: "Contact Form", status: "qualified", date: "1 day ago", hasAccount: true, isVerified: false },
+  { id: 4, name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", source: "Lead Capture", status: "new", date: "1 day ago", hasAccount: true, isVerified: false },
+  { id: 5, name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", source: "Lead Capture", status: "converted", date: "2 days ago", hasAccount: true, isVerified: true },
+];
+
+// Mock data for captured users
+const mockUsers = [
+  { id: "u1", name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", isVerified: false, totalInquiries: 3, lastActive: "2 hours ago", createdAt: "Today" },
+  { id: "u2", name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", isVerified: true, totalInquiries: 5, lastActive: "5 hours ago", createdAt: "Yesterday" },
+  { id: "u3", name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", isVerified: false, totalInquiries: 2, lastActive: "1 day ago", createdAt: "2 days ago" },
+  { id: "u4", name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", isVerified: false, totalInquiries: 1, lastActive: "1 day ago", createdAt: "3 days ago" },
+  { id: "u5", name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", isVerified: true, totalInquiries: 8, lastActive: "2 days ago", createdAt: "1 week ago" },
 ];
 
 // Mock data for recent calls
@@ -97,6 +106,7 @@ const sidebarItems = [
   { name: "Dashboard", icon: LayoutDashboard, active: true },
   { name: "Listings", icon: Home, count: 24 },
   { name: "Leads", icon: Users, count: 47 },
+  { name: "Users", icon: Users, count: mockUsers.length, highlight: true },
   { name: "Messages", icon: MessageSquare, count: 12 },
   { name: "Calls", icon: Phone, count: 8 },
   { name: "Showings", icon: Calendar, count: 5 },
@@ -465,6 +475,133 @@ export default function AdminDashboard() {
                   <p className="mt-2 text-xs md:text-sm text-gray-600 ml-10 md:ml-14">{call.summary}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Captured Users / Accounts */}
+          <div className="mt-4 md:mt-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="p-4 md:p-6 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-100 flex items-center justify-center">
+                    <Users className="w-4 h-4 md:w-5 md:h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-base md:text-lg font-bold text-gray-900">Captured Users</h2>
+                    <p className="text-xs md:text-sm text-gray-500">User accounts from lead capture</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
+                    {mockUsers.length} Total Users
+                  </span>
+                  <button className="flex items-center space-x-2 px-3 py-1.5 md:py-2 text-gray-600 hover:bg-gray-50 rounded-lg text-xs md:text-sm self-start sm:self-auto">
+                    <Download className="w-4 h-4" />
+                    <span>Export</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {mockUsers.map((user) => (
+                <div key={user.id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-medium text-sm">
+                        {user.name.split(" ").map(n => n[0]).join("")}
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <p className="font-medium text-gray-900 text-sm">{user.name}</p>
+                          {user.isVerified && (
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                        <p className="text-xs text-gray-400">{user.phone}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-medium text-emerald-600">{user.totalInquiries} inquiries</span>
+                      <p className="text-[10px] text-gray-400">Joined {user.createdAt}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inquiries</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {mockUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-medium">
+                            {user.name.split(" ").map(n => n[0]).join("")}
+                          </div>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <p className="font-medium text-gray-900">{user.name}</p>
+                              {user.isVerified && (
+                                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500">Last active: {user.lastActive}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-sm text-gray-900">{user.email}</p>
+                        <p className="text-xs text-gray-500">{user.phone}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        {user.isVerified ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center w-fit">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Verified
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+                            Pending
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-semibold text-gray-900">{user.totalInquiries}</span>
+                        <span className="text-xs text-gray-500 ml-1">total</span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{user.createdAt}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
+                          <button className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            <MessageSquare className="w-4 h-4" />
+                          </button>
+                          <button className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                            <Phone className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

@@ -108,6 +108,8 @@ export default function LeadCaptureModal({
       });
 
       if (response.ok) {
+        const result = await response.json();
+
         // Store in localStorage that user has submitted lead info
         localStorage.setItem("leadCaptured", "true");
         localStorage.setItem(
@@ -115,9 +117,23 @@ export default function LeadCaptureModal({
           JSON.stringify({
             name: formData.name,
             email: formData.email,
+            phone: formData.phone,
             capturedAt: new Date().toISOString(),
           })
         );
+
+        // Store user account info if returned
+        if (result.data?.user) {
+          localStorage.setItem(
+            "userData",
+            JSON.stringify({
+              id: result.data.user.id,
+              name: result.data.user.name,
+              email: result.data.user.email,
+              isNew: result.data.user.isNew,
+            })
+          );
+        }
 
         setIsSuccess(true);
         onSubmit({ ...formData, source });
