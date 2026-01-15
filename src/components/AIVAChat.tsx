@@ -170,7 +170,6 @@ export default function AIVAChat() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [showBubble, setShowBubble] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Retell state
@@ -203,16 +202,6 @@ export default function AIVAChat() {
       client.stopCall();
     };
   }, []);
-
-  // Auto-open after 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isOpen) {
-        setShowBubble(true);
-      }
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -454,35 +443,10 @@ export default function AIVAChat() {
 
   return (
     <>
-      {/* Chat Bubble Notification */}
-      {!isOpen && showBubble && (
-        <div className="fixed bottom-24 right-6 z-40 animate-bounce">
-          <div className="bg-white rounded-2xl shadow-xl p-4 max-w-xs border border-gray-100">
-            <button
-              onClick={() => setShowBubble(false)}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-300"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <div className="flex items-start space-x-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-800">
-                  <span className="font-semibold">Hi! I&apos;m AIVA</span> - Need help finding a home? I&apos;m available 24/7!
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Chat Button */}
       <button
         onClick={() => {
           setIsOpen(!isOpen);
-          setShowBubble(false);
           setIsMinimized(false);
         }}
         className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all transform hover:scale-110 ${
