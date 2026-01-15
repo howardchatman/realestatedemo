@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -27,6 +27,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIVAChat from "@/components/AIVAChat";
 import CallButton from "@/components/CallButton";
+import LeadCaptureModal, { useLeadCapture } from "@/components/LeadCaptureModal";
 
 // Sample listings data - in production, this would come from an API/database
 const allListings = [
@@ -342,6 +343,20 @@ export default function ListingDetailPage({ params }: PageProps) {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
+  // Lead capture modal state
+  const { hasSubmitted, setHasSubmitted } = useLeadCapture();
+  const [showLeadModal, setShowLeadModal] = useState(false);
+
+  // Show lead capture modal after a short delay if not already captured
+  useEffect(() => {
+    if (!hasSubmitted) {
+      const timer = setTimeout(() => {
+        setShowLeadModal(true);
+      }, 2000); // Show after 2 seconds on detail page
+      return () => clearTimeout(timer);
+    }
+  }, [hasSubmitted]);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -392,6 +407,18 @@ export default function ListingDetailPage({ params }: PageProps) {
   return (
     <>
       <Navbar />
+
+      {/* Lead Capture Modal */}
+      <LeadCaptureModal
+        isOpen={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        onSubmit={() => {
+          setHasSubmitted(true);
+          setShowLeadModal(false);
+        }}
+        source={`listing_detail_${listingId}`}
+      />
+
       <main className="min-h-screen bg-gray-50 pt-20">
         {/* Back Button */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

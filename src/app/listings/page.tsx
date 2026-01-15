@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -20,6 +20,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIVAChat from "@/components/AIVAChat";
+import LeadCaptureModal, { useLeadCapture } from "@/components/LeadCaptureModal";
 
 // Sample listings data - in production, this would come from an API/database
 const allListings = [
@@ -173,6 +174,20 @@ export default function ListingsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [favorites, setFavorites] = useState<number[]>([]);
 
+  // Lead capture modal state
+  const { hasSubmitted, setHasSubmitted } = useLeadCapture();
+  const [showLeadModal, setShowLeadModal] = useState(false);
+
+  // Show lead capture modal after a short delay if not already captured
+  useEffect(() => {
+    if (!hasSubmitted) {
+      const timer = setTimeout(() => {
+        setShowLeadModal(true);
+      }, 1500); // Show after 1.5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [hasSubmitted]);
+
   const toggleFavorite = (id: number) => {
     setFavorites((prev) =>
       prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
@@ -262,6 +277,18 @@ export default function ListingsPage() {
   return (
     <>
       <Navbar />
+
+      {/* Lead Capture Modal */}
+      <LeadCaptureModal
+        isOpen={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        onSubmit={() => {
+          setHasSubmitted(true);
+          setShowLeadModal(false);
+        }}
+        source="listings_page"
+      />
+
       <main className="min-h-screen bg-gray-50 pt-20">
         {/* Header */}
         <div className="bg-white border-b">
