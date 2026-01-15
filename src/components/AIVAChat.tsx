@@ -318,7 +318,7 @@ export default function AIVAChat() {
     setMessages((prev) => [...prev, endMessage]);
   };
 
-  const handleSendMessage = (text: string) => {
+  const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
 
     const newMessage: Message = {
@@ -332,31 +332,84 @@ export default function AIVAChat() {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const lowerText = text.toLowerCase();
-      let response = aiResponses.default;
+    const lowerText = text.toLowerCase();
 
-      for (const key of Object.keys(aiResponses)) {
-        if (lowerText.includes(key)) {
-          response = aiResponses[key];
-          break;
-        }
-      }
+    // Check for special UI triggers first (listings, calendar)
+    let specialResponse: { text: string; options?: string[]; listings?: typeof mockListings; calendar?: boolean } | null = null;
 
+    // Show listings for listing-related queries
+    if (lowerText.includes("show") && (lowerText.includes("listing") || lowerText.includes("home") || lowerText.includes("properties") || lowerText.includes("picks") || lowerText.includes("options"))) {
+      specialResponse = { text: "Here are some properties that match what you're looking for:", listings: mockListings };
+    }
+    // Show calendar for scheduling queries
+    else if (lowerText.includes("schedule") || lowerText.includes("showing") || lowerText.includes("tour") || lowerText.includes("appointment")) {
+      specialResponse = { text: "I'd be happy to schedule a showing for you! Here are our available time slots:", calendar: true };
+    }
+
+    if (specialResponse) {
       const aiMessage: Message = {
         id: messages.length + 2,
         sender: "ai",
-        text: response.text,
+        text: specialResponse.text,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        options: response.options,
-        listings: response.listings,
-        calendar: response.calendar,
+        options: specialResponse.options,
+        listings: specialResponse.listings,
+        calendar: specialResponse.calendar,
       };
-
       setIsTyping(false);
       setMessages((prev) => [...prev, aiMessage]);
-    }, 1500);
+      return;
+    }
+
+    // Try Retell AI for dynamic responses
+    try {
+      const response = await fetch("/api/retell/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          conversationHistory: messages.slice(-10).map(m => ({ sender: m.sender, text: m.text })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data?.response) {
+        const aiMessage: Message = {
+          id: messages.length + 2,
+          sender: "ai",
+          text: data.data.response,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        };
+        setIsTyping(false);
+        setMessages((prev) => [...prev, aiMessage]);
+        return;
+      }
+    } catch (error) {
+      console.error("Retell chat error:", error);
+    }
+
+    // Fallback to rule-based responses if Retell fails
+    let response = aiResponses.default;
+    for (const key of Object.keys(aiResponses)) {
+      if (lowerText.includes(key)) {
+        response = aiResponses[key];
+        break;
+      }
+    }
+
+    const aiMessage: Message = {
+      id: messages.length + 2,
+      sender: "ai",
+      text: response.text,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      options: response.options,
+      listings: response.listings,
+      calendar: response.calendar,
+    };
+
+    setIsTyping(false);
+    setMessages((prev) => [...prev, aiMessage]);
   };
 
   const handleOptionClick = (option: string) => {
