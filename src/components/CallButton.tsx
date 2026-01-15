@@ -1,21 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { RetellWebClient } from "retell-client-js-sdk";
 import { Phone, PhoneOff, Mic, MicOff, Volume2 } from "lucide-react";
-
-declare global {
-  interface Window {
-    Retell: {
-      RetellWebClient: new () => RetellWebClient;
-    };
-  }
-}
-
-interface RetellWebClient {
-  startCall(config: { accessToken: string }): Promise<void>;
-  stopCall(): void;
-  on(event: string, callback: (data?: unknown) => void): void;
-}
 
 interface CallButtonProps {
   className?: string;
@@ -29,41 +16,33 @@ export default function CallButton({ className = "", variant = "default" }: Call
   const [retellClient, setRetellClient] = useState<RetellWebClient | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load Retell SDK
+  // Initialize Retell SDK
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.retellai.com/retell-web-sdk/retell-web-sdk.min.js";
-    script.async = true;
-    script.onload = () => {
-      if (window.Retell) {
-        const client = new window.Retell.RetellWebClient();
+    const client = new RetellWebClient();
 
-        client.on("call_started", () => {
-          console.log("Call started");
-          setIsCallActive(true);
-          setIsConnecting(false);
-        });
+    client.on("call_started", () => {
+      console.log("Call started");
+      setIsCallActive(true);
+      setIsConnecting(false);
+    });
 
-        client.on("call_ended", () => {
-          console.log("Call ended");
-          setIsCallActive(false);
-          setIsConnecting(false);
-        });
+    client.on("call_ended", () => {
+      console.log("Call ended");
+      setIsCallActive(false);
+      setIsConnecting(false);
+    });
 
-        client.on("error", (err) => {
-          console.error("Retell error:", err);
-          setError("Call failed. Please try again.");
-          setIsCallActive(false);
-          setIsConnecting(false);
-        });
+    client.on("error", (err) => {
+      console.error("Retell error:", err);
+      setError("Call failed. Please try again.");
+      setIsCallActive(false);
+      setIsConnecting(false);
+    });
 
-        setRetellClient(client);
-      }
-    };
-    document.body.appendChild(script);
+    setRetellClient(client);
 
     return () => {
-      document.body.removeChild(script);
+      client.stopCall();
     };
   }, []);
 
