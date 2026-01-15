@@ -73,11 +73,11 @@ export default function Footer() {
             {/* Contact Info */}
             <div className="space-y-3">
               <a
-                href="tel:+15551234567"
+                href="tel:+18327707998"
                 className="flex items-center space-x-3 text-gray-400 hover:text-emerald-400 transition-colors"
               >
                 <Phone className="w-5 h-5" />
-                <span>(555) 123-4567</span>
+                <span>(832) 770-7998</span>
               </a>
               <a
                 href="mailto:hello@chatmanrealestate.com"

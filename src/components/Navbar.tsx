@@ -67,11 +67,11 @@ export default function Navbar() {
               <Heart className="w-5 h-5" />
             </button>
             <a
-              href="tel:+15551234567"
+              href="tel:+18327707998"
               className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors"
             >
               <Phone className="w-4 h-4" />
-              <span className="font-medium">(555) 123-4567</span>
+              <span className="font-medium">(832) 770-7998</span>
             </a>
             <a
               href="#contact"
@@ -110,11 +110,11 @@ export default function Navbar() {
               ))}
               <hr className="my-2" />
               <a
-                href="tel:+15551234567"
+                href="tel:+18327707998"
                 className="flex items-center space-x-2 text-gray-600 py-2"
               >
                 <Phone className="w-4 h-4" />
-                <span className="font-medium">(555) 123-4567</span>
+                <span className="font-medium">(832) 770-7998</span>
               </a>
               <a
                 href="#contact"

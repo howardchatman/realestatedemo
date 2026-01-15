@@ -164,7 +164,7 @@ export default function ContactSection() {
                         onChange={(e) =>
                           setFormData({ ...formData, phone: e.target.value })
                         }
-                        placeholder="(555) 123-4567"
+                        placeholder="(832) 770-7998"
                         className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         required
                       />
