@@ -77,13 +77,13 @@ const mockListings = [
   },
 ];
 
-// Mock data for leads with user account info
+// Mock data for leads with user account info and temperature
 const mockLeads = [
-  { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", source: "Lead Capture", status: "new", date: "2 hours ago", hasAccount: true, isVerified: false },
-  { id: 2, name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", source: "Phone Call", status: "contacted", date: "5 hours ago", hasAccount: true, isVerified: true },
-  { id: 3, name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", source: "Contact Form", status: "qualified", date: "1 day ago", hasAccount: true, isVerified: false },
-  { id: 4, name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", source: "Lead Capture", status: "new", date: "1 day ago", hasAccount: true, isVerified: false },
-  { id: 5, name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", source: "Lead Capture", status: "converted", date: "2 days ago", hasAccount: true, isVerified: true },
+  { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", source: "Lead Capture", status: "new", date: "2 hours ago", hasAccount: true, isVerified: false, financing: "pre-approved", temperature: "hot" },
+  { id: 2, name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", source: "Phone Call", status: "contacted", date: "5 hours ago", hasAccount: true, isVerified: true, financing: "cash", temperature: "hot" },
+  { id: 3, name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", source: "Contact Form", status: "qualified", date: "1 day ago", hasAccount: true, isVerified: false, financing: "working-with-lender", temperature: "warm" },
+  { id: 4, name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", source: "Lead Capture", status: "new", date: "1 day ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
+  { id: 5, name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", source: "Lead Capture", status: "converted", date: "2 days ago", hasAccount: true, isVerified: true, financing: "pre-qualified", temperature: "warm" },
 ];
 
 // Mock data for captured users
@@ -147,6 +147,48 @@ const getLeadStatusBadge = (status: string) => {
       return <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex items-center"><CheckCircle className="w-3 h-3 mr-1" />Converted</span>;
     default:
       return <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">{status}</span>;
+  }
+};
+
+const getTemperatureBadge = (temperature: string) => {
+  switch (temperature) {
+    case "hot":
+      return (
+        <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full flex items-center">
+          🔥 Hot
+        </span>
+      );
+    case "warm":
+      return (
+        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded-full flex items-center">
+          🌡️ Warm
+        </span>
+      );
+    case "cold":
+      return (
+        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full flex items-center">
+          ❄️ Cold
+        </span>
+      );
+    default:
+      return null;
+  }
+};
+
+const getFinancingLabel = (financing: string) => {
+  switch (financing) {
+    case "pre-approved":
+      return "Pre-approved";
+    case "pre-qualified":
+      return "Pre-qualified";
+    case "working-with-lender":
+      return "Working with lender";
+    case "exploring":
+      return "Exploring options";
+    case "cash":
+      return "Cash buyer";
+    default:
+      return financing;
   }
 };
 
@@ -307,6 +349,37 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* Lead Temperature Breakdown */}
+          <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 mb-6 md:mb-8">
+            <h3 className="text-base md:text-lg font-bold text-gray-900 mb-4">Lead Temperature</h3>
+            <div className="grid grid-cols-3 gap-3 md:gap-4">
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-3 md:p-4 border border-red-100">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-xl md:text-2xl">🔥</span>
+                  <span className="font-bold text-red-700 text-sm md:text-base">Hot</span>
+                </div>
+                <p className="text-2xl md:text-3xl font-bold text-gray-900">12</p>
+                <p className="text-[10px] md:text-xs text-gray-500 mt-1">Pre-approved & Cash</p>
+              </div>
+              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-3 md:p-4 border border-orange-100">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-xl md:text-2xl">🌡️</span>
+                  <span className="font-bold text-orange-700 text-sm md:text-base">Warm</span>
+                </div>
+                <p className="text-2xl md:text-3xl font-bold text-gray-900">18</p>
+                <p className="text-[10px] md:text-xs text-gray-500 mt-1">Working with lenders</p>
+              </div>
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-3 md:p-4 border border-blue-100">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-xl md:text-2xl">❄️</span>
+                  <span className="font-bold text-blue-700 text-sm md:text-base">Cold</span>
+                </div>
+                <p className="text-2xl md:text-3xl font-bold text-gray-900">17</p>
+                <p className="text-[10px] md:text-xs text-gray-500 mt-1">Exploring options</p>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Listings Table */}
             <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -415,12 +488,21 @@ export default function AdminDashboard() {
                   <div key={lead.id} className="p-3 md:p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
-                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-600 font-medium text-xs md:text-sm flex-shrink-0">
+                        <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-medium text-xs md:text-sm flex-shrink-0 ${
+                          lead.temperature === "hot"
+                            ? "bg-gradient-to-br from-red-400 to-orange-500 text-white"
+                            : lead.temperature === "warm"
+                            ? "bg-gradient-to-br from-orange-300 to-yellow-400 text-white"
+                            : "bg-gradient-to-br from-blue-300 to-cyan-400 text-white"
+                        }`}>
                           {lead.name.split(" ").map(n => n[0]).join("")}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-gray-900 text-sm truncate">{lead.name}</p>
-                          <p className="text-[10px] md:text-xs text-gray-500 truncate">{lead.source} • {lead.date}</p>
+                          <div className="flex items-center space-x-2">
+                            <p className="font-medium text-gray-900 text-sm truncate">{lead.name}</p>
+                            {getTemperatureBadge(lead.temperature)}
+                          </div>
+                          <p className="text-[10px] md:text-xs text-gray-500 truncate">{getFinancingLabel(lead.financing)} • {lead.date}</p>
                         </div>
                       </div>
                       <div className="flex-shrink-0">{getLeadStatusBadge(lead.status)}</div>
