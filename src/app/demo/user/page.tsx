@@ -27,7 +27,9 @@ import {
   Phone,
   Menu,
   X,
+  Share2,
 } from "lucide-react";
+import ReferralTools from "@/components/ReferralTools";
 
 // Mock saved listings
 const savedListings = [
@@ -99,6 +101,7 @@ const sidebarItems = [
   { name: "Saved Searches", icon: Search, count: 3 },
   { name: "Showings", icon: Calendar, count: 2 },
   { name: "Messages", icon: MessageSquare, count: 1 },
+  { name: "Share App", icon: Share2, highlight: true },
   { name: "Notifications", icon: Bell, count: 5 },
   { name: "Profile", icon: User },
   { name: "Settings", icon: Settings },
@@ -212,6 +215,8 @@ export default function UserDashboard() {
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg mb-1 transition-colors ${
                   item.active
                     ? "bg-emerald-50 text-emerald-700"
+                    : (item as { highlight?: boolean }).highlight
+                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:shadow-md"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
               >
@@ -408,6 +413,9 @@ export default function UserDashboard() {
                   ))}
                 </div>
               </div>
+
+              {/* Share App - Referral Tools */}
+              <ReferralTools compact />
 
               {/* Saved Searches */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100">
