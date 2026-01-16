@@ -16,7 +16,6 @@ import {
   Home,
   FileText,
   ArrowRight,
-  Info,
 } from "lucide-react";
 
 function ScheduleContent() {
@@ -404,18 +403,17 @@ function ScheduleContent() {
               </div>
             </div>
 
-            {/* Coming Soon Banner */}
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
+            {/* Calendar Integration Banner */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-6">
               <div className="flex items-start space-x-3">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Calendar className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-blue-800">
-                    Coming Soon: Calendar Sync
+                  <p className="text-sm font-medium text-emerald-800">
+                    Calendly, Google Calendar &amp; iCal Integration
                   </p>
-                  <p className="text-sm text-blue-600">
-                    Soon you&apos;ll be able to sync your Google Calendar, iCal, or
-                    Calendly to automatically see your availability and avoid
-                    scheduling conflicts.
+                  <p className="text-sm text-emerald-600">
+                    Available as a free add-on to sync your calendar and automatically
+                    see your availability. Ask us about setup!
                   </p>
                 </div>
               </div>
