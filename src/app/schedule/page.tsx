@@ -369,7 +369,7 @@ function ScheduleContent() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Pre-approved for Mortgage?
+                    Financing Status
                   </label>
                   <select
                     value={formData.preApproved}
@@ -378,10 +378,12 @@ function ScheduleContent() {
                     }
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-700"
                   >
-                    <option value="">Select status</option>
-                    <option value="yes">Yes, I&apos;m pre-approved</option>
-                    <option value="no">No, not yet</option>
-                    <option value="planning">Not yet, but planning to</option>
+                    <option value="">Select financing status</option>
+                    <option value="pre-approved">Pre-approved (have approval letter)</option>
+                    <option value="pre-qualified">Pre-qualified (initial estimate)</option>
+                    <option value="working-with-lender">Currently working with a lender</option>
+                    <option value="exploring">Just starting to explore options</option>
+                    <option value="cash">Cash buyer / No financing needed</option>
                   </select>
                 </div>
               </div>
