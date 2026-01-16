@@ -676,7 +676,7 @@ export default function ListingDetailPage({ params }: PageProps) {
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Schedule a Tour</h3>
                 <p className="text-gray-600 text-sm mb-4">See this home in person. Our agents are available 7 days a week.</p>
                 <Link
-                  href="#contact"
+                  href={`/schedule?propertyId=${listing.id}&address=${encodeURIComponent(listing.address)}`}
                   className="w-full py-3 bg-emerald-600 text-white rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-emerald-700 transition-all"
                 >
                   <Calendar className="w-5 h-5" />

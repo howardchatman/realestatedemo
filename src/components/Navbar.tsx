@@ -128,12 +128,12 @@ export default function Navbar() {
               <Phone className="w-4 h-4" />
               <span className="font-medium">(832) 770-7998</span>
             </a>
-            <a
-              href="#contact"
+            <Link
+              href="/schedule"
               className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
             >
               Schedule Showing
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -193,12 +193,13 @@ export default function Navbar() {
                 <Phone className="w-4 h-4" />
                 <span className="font-medium">(832) 770-7998</span>
               </a>
-              <a
-                href="#contact"
+              <Link
+                href="/schedule"
                 className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 Schedule Showing
-              </a>
+              </Link>
             </div>
           </div>
         )}
