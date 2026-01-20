@@ -387,7 +387,7 @@ function ProblemSolutionSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="text-3xl sm:text-4xl font-bold text-gray-900 mb-12 text-center"
+              className="text-3xl sm:text-4xl font-bold mb-12 text-center bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent"
             >
               {sectionTitle}
             </motion.h2>
