@@ -760,6 +760,7 @@ const problemSolutions = [
       "See exactly who needs attention right now",
     ],
     icon: Users,
+    image: "/images/demo_image_4.png",
   },
   {
     problem: "You can't tell who's ready to buy",
