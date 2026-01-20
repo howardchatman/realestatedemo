@@ -777,7 +777,7 @@ const problemSolutions = [
       "No more app-switching or lost context",
     ],
     icon: Layers,
-    image: "/images/demo_image_4.png",
+    image: "/images/demo_image_2.jpg",
   },
   {
     problem: "You're working more but closing the same",
