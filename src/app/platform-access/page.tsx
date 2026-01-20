@@ -382,15 +382,23 @@ function ProblemSolutionSection({
       <section className={`py-20 ${isReversed ? "bg-gray-50" : "bg-white"}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {sectionTitle && (
-            <motion.h2
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="text-3xl sm:text-4xl font-bold mb-12 text-center bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent"
+              className="text-center mb-12"
             >
-              {sectionTitle}
-            </motion.h2>
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl">
+                  <Icon className="w-7 h-7 text-red-500" />
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-red-500">
+                  {sectionTitle}
+                </h2>
+              </div>
+              <p className="text-gray-500 text-xl">Sound familiar?</p>
+            </motion.div>
           )}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -401,19 +409,16 @@ function ProblemSolutionSection({
           >
             {/* Content Side */}
             <div className="flex-1">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl mb-6">
-                <Icon className="w-7 h-7 text-red-500" />
-              </div>
               {!sectionTitle && (
                 <>
+                  <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl mb-6">
+                    <Icon className="w-7 h-7 text-red-500" />
+                  </div>
                   <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                     {problem}
                   </h3>
                   <p className="text-gray-500 text-lg mb-8">Sound familiar?</p>
                 </>
-              )}
-              {sectionTitle && (
-                <p className="text-gray-500 text-lg mb-8">Sound familiar?</p>
               )}
 
               <h4 className="text-lg font-semibold text-emerald-600 mb-4">
