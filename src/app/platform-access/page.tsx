@@ -286,10 +286,29 @@ function ApplicationModal({
   );
 }
 
+// Header with Chatman RP branding
+function Header() {
+  return (
+    <header className="absolute top-0 left-0 right-0 z-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-2xl font-bold text-white">Chatman RP</span>
+            <span className="hidden sm:inline text-gray-400 text-sm ml-3">
+              Relationship Platform for Real Estate
+            </span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 // Hero Section
 function HeroSection({ onApply }: { onApply: () => void }) {
   return (
     <section className="relative min-h-[90vh] flex items-center">
+      <Header />
       <div className="absolute inset-0">
         <img
           src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1920&q=80"
@@ -313,7 +332,7 @@ function HeroSection({ onApply }: { onApply: () => void }) {
           </h1>
 
           <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Chatman handles calls, follows up with leads, and tells you exactly
+            Chatman RP handles calls, follows up with leads, and tells you exactly
             who needs your attention — so you can focus on closing deals.
           </p>
 
@@ -498,7 +517,7 @@ function ComparisonSection() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 text-center">
-            How Chatman Compares
+            How Chatman RP Compares
           </h2>
           <p className="text-gray-500 text-center mb-12">
             We're not saying they're bad — we're just built different.
@@ -509,7 +528,7 @@ function ComparisonSection() {
               <thead>
                 <tr className="border-b border-gray-100">
                   <th className="text-left py-4 px-6 font-semibold text-gray-900">Feature</th>
-                  <th className="text-center py-4 px-4 font-semibold text-emerald-600 bg-emerald-50">Chatman</th>
+                  <th className="text-center py-4 px-4 font-semibold text-emerald-600 bg-emerald-50">Chatman RP</th>
                   <th className="text-center py-4 px-4 font-semibold text-gray-600">Place</th>
                   <th className="text-center py-4 px-4 font-semibold text-gray-600">BoomTown</th>
                   <th className="text-center py-4 px-4 font-semibold text-gray-600">kvCORE</th>
@@ -631,7 +650,7 @@ function SimpleFooter() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-center justify-between">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Chatman Real Estate
+            © {new Date().getFullYear()} Chatman RP
           </p>
           <div className="flex space-x-6 mt-4 sm:mt-0">
             <Link
