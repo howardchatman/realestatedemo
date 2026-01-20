@@ -366,12 +366,80 @@ function ProblemSolutionSection({
   solutions,
   icon: Icon,
   isReversed,
+  image,
 }: {
   problem: string;
   solutions: string[];
   icon: React.ElementType;
   isReversed: boolean;
+  image?: string;
 }) {
+  // If there's an image, use a different layout
+  if (image) {
+    return (
+      <section className={`py-20 ${isReversed ? "bg-gray-50" : "bg-white"}`}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className={`flex flex-col ${isReversed ? "lg:flex-row-reverse" : "lg:flex-row"} items-center gap-12`}
+          >
+            {/* Content Side */}
+            <div className="flex-1">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl mb-6">
+                <Icon className="w-7 h-7 text-red-500" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                {problem}
+              </h2>
+              <p className="text-gray-500 text-lg mb-8">Sound familiar?</p>
+
+              <h3 className="text-lg font-semibold text-emerald-600 mb-4">
+                How Chatman makes it better:
+              </h3>
+              <ul className="space-y-3">
+                {solutions.map((solution, i) => (
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, x: 10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.1 }}
+                    className="flex items-start space-x-3"
+                  >
+                    <div className="flex-shrink-0 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <p className="text-gray-700 text-lg">{solution}</p>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Image Side */}
+            <div className="flex-1">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="rounded-2xl overflow-hidden shadow-2xl"
+              >
+                <img
+                  src={image}
+                  alt="Chatman RP Dashboard"
+                  className="w-full h-auto"
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={`py-20 ${isReversed ? "bg-gray-50" : "bg-white"}`}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -709,6 +777,7 @@ const problemSolutions = [
       "No more app-switching or lost context",
     ],
     icon: Layers,
+    image: "/images/demo_image_4.png",
   },
   {
     problem: "You're working more but closing the same",
@@ -740,6 +809,7 @@ export default function PlatformAccessPage() {
           solutions={ps.solutions}
           icon={ps.icon}
           isReversed={index % 2 === 1}
+          image={ps.image}
         />
       ))}
 
