@@ -367,18 +367,31 @@ function ProblemSolutionSection({
   icon: Icon,
   isReversed,
   image,
+  sectionTitle,
 }: {
   problem: string;
   solutions: string[];
   icon: React.ElementType;
   isReversed: boolean;
   image?: string;
+  sectionTitle?: string;
 }) {
   // If there's an image, use a different layout
   if (image) {
     return (
       <section className={`py-20 ${isReversed ? "bg-gray-50" : "bg-white"}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {sectionTitle && (
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="text-3xl sm:text-4xl font-bold text-gray-900 mb-12 text-center"
+            >
+              {sectionTitle}
+            </motion.h2>
+          )}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -391,14 +404,14 @@ function ProblemSolutionSection({
               <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl mb-6">
                 <Icon className="w-7 h-7 text-red-500" />
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 {problem}
-              </h2>
+              </h3>
               <p className="text-gray-500 text-lg mb-8">Sound familiar?</p>
 
-              <h3 className="text-lg font-semibold text-emerald-600 mb-4">
+              <h4 className="text-lg font-semibold text-emerald-600 mb-4">
                 How Chatman makes it better:
-              </h3>
+              </h4>
               <ul className="space-y-3">
                 {solutions.map((solution, i) => (
                   <motion.li
@@ -751,6 +764,7 @@ const problemSolutions = [
     ],
     icon: Phone,
     image: "/images/demo_image_3.jpg",
+    sectionTitle: "You're missing calls while showing homes.",
   },
   {
     problem: "Leads slip through the cracks",
@@ -812,6 +826,7 @@ export default function PlatformAccessPage() {
           icon={ps.icon}
           isReversed={index % 2 === 1}
           image={ps.image}
+          sectionTitle={ps.sectionTitle}
         />
       ))}
 
