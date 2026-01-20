@@ -421,7 +421,7 @@ function ProblemSolutionSection({
                 </>
               )}
 
-              <h4 className="text-xl sm:text-2xl font-semibold text-emerald-600 mb-4">
+              <h4 className="text-xl sm:text-2xl font-bold text-emerald-600 mb-4">
                 How Chatman RP makes it better:
               </h4>
               <ul className="space-y-3">
