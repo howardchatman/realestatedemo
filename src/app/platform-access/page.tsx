@@ -397,7 +397,7 @@ function ProblemSolutionSection({
                   {sectionTitle}
                 </h2>
               </div>
-              <p className="text-gray-500 text-xl">Sound familiar?</p>
+              <p className="text-gray-500 text-xl font-bold">Sound familiar?</p>
             </motion.div>
           )}
           <motion.div
@@ -421,7 +421,7 @@ function ProblemSolutionSection({
                 </>
               )}
 
-              <h4 className="text-xl sm:text-2xl font-bold text-emerald-600 mb-4">
+              <h4 className="text-2xl sm:text-3xl font-bold text-emerald-600 mb-6">
                 How Chatman RP makes it better:
               </h4>
               <ul className="space-y-3">
