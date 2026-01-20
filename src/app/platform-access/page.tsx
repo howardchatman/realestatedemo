@@ -467,55 +467,53 @@ function ProblemSolutionSection({
 
   return (
     <section className={`py-20 ${isReversed ? "bg-gray-50" : "bg-white"}`}>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {sectionTitle && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-12"
+          >
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl">
+                <Icon className="w-7 h-7 text-red-500" />
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-red-500">
+                {sectionTitle}
+              </h2>
+            </div>
+            <p className="text-gray-500 text-xl font-bold">Sound familiar?</p>
+          </motion.div>
+        )}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className={`flex flex-col ${isReversed ? "md:flex-row-reverse" : "md:flex-row"} items-center gap-12`}
+          className="max-w-3xl mx-auto"
         >
-          {/* Problem Side */}
-          <div className="flex-1 text-center md:text-left">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl mb-6">
-              <Icon className="w-7 h-7 text-red-500" />
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              {problem}
-            </h2>
-            <p className="text-gray-500 text-lg">Sound familiar?</p>
-          </div>
-
-          {/* Arrow */}
-          <div className="hidden md:flex items-center justify-center">
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
-              <ArrowRight className="w-8 h-8 text-emerald-600" />
-            </div>
-          </div>
-
-          {/* Solution Side */}
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-emerald-600 mb-4">
-              How Chatman RP makes it better:
-            </h3>
-            <ul className="space-y-3">
-              {solutions.map((solution, i) => (
-                <motion.li
-                  key={i}
-                  initial={{ opacity: 0, x: 10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  className="flex items-start space-x-3"
-                >
-                  <div className="flex-shrink-0 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center mt-0.5">
-                    <Check className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-gray-700 text-lg">{solution}</p>
-                </motion.li>
-              ))}
-            </ul>
-          </div>
+          <h4 className="text-2xl sm:text-3xl font-bold text-emerald-600 mb-6 text-center">
+            How Chatman RP makes it better:
+          </h4>
+          <ul className="space-y-3">
+            {solutions.map((solution, i) => (
+              <motion.li
+                key={i}
+                initial={{ opacity: 0, x: 10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="flex items-start space-x-3"
+              >
+                <div className="flex-shrink-0 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center mt-0.5">
+                  <Check className="w-4 h-4 text-white" />
+                </div>
+                <p className="text-gray-700 text-lg">{solution}</p>
+              </motion.li>
+            ))}
+          </ul>
         </motion.div>
       </div>
     </section>
@@ -787,6 +785,7 @@ const problemSolutions = [
     ],
     icon: Users,
     image: "/images/demo_image_4.png",
+    sectionTitle: "Leads slip through the cracks.",
   },
   {
     problem: "You can't tell who's ready to buy",
@@ -796,6 +795,7 @@ const problemSolutions = [
       "Stop wasting time on cold leads",
     ],
     icon: Target,
+    sectionTitle: "You can't tell who's ready to buy.",
   },
   {
     problem: "Too many tools that don't talk to each other",
@@ -806,6 +806,7 @@ const problemSolutions = [
     ],
     icon: Layers,
     image: "/images/demo_image_2.jpg",
+    sectionTitle: "Too many tools that don't talk to each other.",
   },
   {
     problem: "You're working more but closing the same",
@@ -815,6 +816,7 @@ const problemSolutions = [
       "More listings without more hours",
     ],
     icon: Clock,
+    sectionTitle: "You're working more but closing the same.",
   },
 ];
 
