@@ -750,7 +750,7 @@ const problemSolutions = [
       "You get a summary of what they need — ready when you are",
     ],
     icon: Phone,
-    image: "/images/demo_image_1.jpg",
+    image: "/images/demo_image_3.jpg",
   },
   {
     problem: "Leads slip through the cracks",
