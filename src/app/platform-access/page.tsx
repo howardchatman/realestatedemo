@@ -404,10 +404,17 @@ function ProblemSolutionSection({
               <div className="inline-flex items-center justify-center w-14 h-14 bg-red-100 rounded-xl mb-6">
                 <Icon className="w-7 h-7 text-red-500" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                {problem}
-              </h3>
-              <p className="text-gray-500 text-lg mb-8">Sound familiar?</p>
+              {!sectionTitle && (
+                <>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                    {problem}
+                  </h3>
+                  <p className="text-gray-500 text-lg mb-8">Sound familiar?</p>
+                </>
+              )}
+              {sectionTitle && (
+                <p className="text-gray-500 text-lg mb-8">Sound familiar?</p>
+              )}
 
               <h4 className="text-lg font-semibold text-emerald-600 mb-4">
                 How Chatman makes it better:
