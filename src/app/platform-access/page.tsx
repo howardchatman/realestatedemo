@@ -421,8 +421,8 @@ function ProblemSolutionSection({
                 </>
               )}
 
-              <h4 className="text-lg font-semibold text-emerald-600 mb-4">
-                How Chatman makes it better:
+              <h4 className="text-xl sm:text-2xl font-semibold text-emerald-600 mb-4">
+                How Chatman RP makes it better:
               </h4>
               <ul className="space-y-3">
                 {solutions.map((solution, i) => (
@@ -496,7 +496,7 @@ function ProblemSolutionSection({
           {/* Solution Side */}
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-emerald-600 mb-4">
-              How Chatman makes it better:
+              How Chatman RP makes it better:
             </h3>
             <ul className="space-y-3">
               {solutions.map((solution, i) => (
