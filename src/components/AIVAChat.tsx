@@ -164,6 +164,29 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
+// Generate a unique session ID for this chat session
+function generateSessionId(): string {
+  return `chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+
+// Get or create session ID from localStorage
+function getSessionId(): string {
+  if (typeof window === 'undefined') return generateSessionId();
+
+  let sessionId = localStorage.getItem('aiva_session_id');
+  const sessionTimestamp = localStorage.getItem('aiva_session_timestamp');
+
+  // Create new session if none exists or if session is older than 24 hours
+  const twentyFourHours = 24 * 60 * 60 * 1000;
+  if (!sessionId || !sessionTimestamp || Date.now() - parseInt(sessionTimestamp) > twentyFourHours) {
+    sessionId = generateSessionId();
+    localStorage.setItem('aiva_session_id', sessionId);
+    localStorage.setItem('aiva_session_timestamp', Date.now().toString());
+  }
+
+  return sessionId;
+}
+
 export default function AIVAChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -171,11 +194,17 @@ export default function AIVAChat() {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [sessionId, setSessionId] = useState<string>("");
 
   // Retell state
   const [isCallActive, setIsCallActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [retellClient, setRetellClient] = useState<RetellWebClient | null>(null);
+
+  // Initialize session ID on mount
+  useEffect(() => {
+    setSessionId(getSessionId());
+  }, []);
 
   // Initialize Retell SDK
   useEffect(() => {
@@ -230,7 +259,7 @@ export default function AIVAChat() {
       const response = await fetch("/api/retell/web-call", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ sessionId }),
       });
 
       const data = await response.json();
@@ -334,6 +363,7 @@ export default function AIVAChat() {
         body: JSON.stringify({
           message: text,
           conversationHistory: messages.slice(-10).map(m => ({ sender: m.sender, text: m.text })),
+          sessionId,
         }),
       });
 
