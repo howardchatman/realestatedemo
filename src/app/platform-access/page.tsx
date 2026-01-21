@@ -379,7 +379,7 @@ function ProblemSolutionSection({
   // If there's an image, use a different layout
   if (image) {
     return (
-      <section className={`py-20 ${isReversed ? "bg-gray-50" : "bg-white"}`}>
+      <section className={`py-20 ${isReversed ? "bg-gray-200" : "bg-white"}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {sectionTitle && (
             <motion.div
@@ -466,7 +466,7 @@ function ProblemSolutionSection({
   }
 
   return (
-    <section className={`py-20 ${isReversed ? "bg-gray-50" : "bg-white"}`}>
+    <section className={`py-20 ${isReversed ? "bg-gray-200" : "bg-white"}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {sectionTitle && (
           <motion.div
