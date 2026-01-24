@@ -21,7 +21,18 @@ import {
   Clock,
   CheckCircle,
   Volume2,
+  PhoneCall,
+  Loader2,
+  ExternalLink,
+  UserPlus,
 } from "lucide-react";
+
+interface LeadInfo {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+}
 
 interface Message {
   id: number;
@@ -32,6 +43,8 @@ interface Message {
   listings?: typeof mockListings;
   calendar?: boolean;
   callStarted?: boolean;
+  callbackForm?: boolean;
+  callbackScheduled?: { phoneNumber: string; delayMinutes: number; lead?: LeadInfo };
 }
 
 // Mock listings data
@@ -78,81 +91,255 @@ const mockTimes = [
   { date: "Thursday", slots: ["10:00 AM", "1:00 PM", "5:00 PM"] },
 ];
 
+// Houston areas we cover
+const houstonAreas = [
+  "Katy",
+  "Sugar Land",
+  "The Woodlands",
+  "Pearland",
+  "Cypress",
+  "Spring",
+  "Humble",
+  "League City",
+  "Missouri City",
+  "Richmond",
+  "Friendswood",
+  "Tomball",
+];
+
 const initialMessages: Message[] = [
   {
     id: 1,
     sender: "ai",
-    text: "Hi! I'm AIVA, your AI real estate assistant. I'm here 24/7 to help you find your perfect home. How can I assist you today?",
+    text: "Hi! I'm AIVA, your AI real estate assistant. I'm here 24/7 to help you find your perfect home. What can I help you with?",
     time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     options: [
-      "I'm looking to buy a home",
-      "I want to sell my property",
-      "Schedule a showing",
-      "Get a home valuation",
+      "Buy a home",
+      "Sell my property",
+      "Talk to an agent",
     ],
   },
 ];
 
 const aiResponses: { [key: string]: { text: string; options?: string[]; listings?: typeof mockListings; calendar?: boolean } } = {
-  "i'm looking to buy a home": {
-    text: "That's exciting! I'd love to help you find your dream home. To give you the best recommendations, could you tell me what area you're interested in and your budget range?",
-    options: ["Under $400K", "$400K - $600K", "$600K - $1M", "Over $1M"],
+  // Main menu
+  "buy a home": {
+    text: "Great! Which area are you interested in?",
+    options: houstonAreas.slice(0, 4), // Show first 4 areas
   },
-  "i want to sell my property": {
-    text: "I can definitely help with that! Would you like a free, instant AI-powered home valuation? Just share your address and I'll analyze recent sales in your area to give you an accurate estimate.",
-    options: ["Get home valuation", "Talk to an agent", "Learn about selling process"],
+  "more areas": {
+    text: "Here are more areas we cover:",
+    options: [...houstonAreas.slice(4, 8), "Even more areas"],
   },
-  "schedule a showing": {
-    text: "I'd be happy to schedule a showing for you! Here are some available time slots. Pick one that works best for you:",
+  "even more areas": {
+    text: "And a few more options:",
+    options: houstonAreas.slice(8),
+  },
+  "sell my property": {
+    text: "I can help with that! What would you like to do first?",
+    options: ["Get home valuation", "Talk to an agent"],
+  },
+  "talk to an agent": {
+    text: "I can connect you with one of our agents. How would you prefer to be contacted?",
+    options: ["Schedule a call", "Request callback now"],
+  },
+  "schedule a call": {
+    text: "When works best for you?",
     calendar: true,
   },
-  "get a home valuation": {
-    text: "Great choice! Our AI valuation is 98% accurate and completely free. Just tell me your property address and I'll have your estimate in seconds.",
-    options: ["Enter my address", "How does it work?", "Talk to an agent"],
+  "request callback now": {
+    text: "I'd be happy to have someone call you back! Please enter your phone number below:",
+    options: [], // This triggers the callback form via isCallbackRequest
+  },
+
+  // Area selections - each leads to budget question
+  "katy": {
+    text: "Katy is a great choice! Excellent schools and family-friendly neighborhoods. What's your budget range?",
+    options: ["Under $300K", "$300K - $500K", "$500K - $750K", "$750K+"],
+  },
+  "sugar land": {
+    text: "Sugar Land has beautiful master-planned communities! What's your budget range?",
+    options: ["Under $300K", "$300K - $500K", "$500K - $750K", "$750K+"],
+  },
+  "the woodlands": {
+    text: "The Woodlands offers luxury living with nature. What's your budget range?",
+    options: ["Under $400K", "$400K - $600K", "$600K - $1M", "$1M+"],
+  },
+  "pearland": {
+    text: "Pearland is growing fast with great value! What's your budget range?",
+    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
+  },
+  "cypress": {
+    text: "Cypress has excellent schools and new construction. What's your budget range?",
+    options: ["Under $300K", "$300K - $500K", "$500K - $750K", "$750K+"],
+  },
+  "spring": {
+    text: "Spring offers great access to downtown and The Woodlands. What's your budget range?",
+    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
+  },
+  "humble": {
+    text: "Humble has affordable options and is growing! What's your budget range?",
+    options: ["Under $250K", "$250K - $400K", "$400K - $550K", "$550K+"],
+  },
+  "league city": {
+    text: "League City is perfect for families near the bay. What's your budget range?",
+    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
+  },
+  "missouri city": {
+    text: "Missouri City offers great value close to the city. What's your budget range?",
+    options: ["Under $250K", "$250K - $400K", "$400K - $550K", "$550K+"],
+  },
+  "richmond": {
+    text: "Richmond has charming neighborhoods and new developments. What's your budget range?",
+    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
+  },
+  "friendswood": {
+    text: "Friendswood is known for top-rated schools! What's your budget range?",
+    options: ["Under $350K", "$350K - $500K", "$500K - $700K", "$700K+"],
+  },
+  "tomball": {
+    text: "Tomball has that small-town feel with big-city access. What's your budget range?",
+    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
+  },
+
+  // Budget selections - lead to bedroom question
+  "under $250k": {
+    text: "Got it! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
+  },
+  "under $300k": {
+    text: "Got it! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
+  },
+  "under $350k": {
+    text: "Got it! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
   },
   "under $400k": {
-    text: "Perfect! We have 47 beautiful homes under $400K. Popular areas in this range include Riverside, Oak Park, and Westside. Would you like to see our top picks or filter by bedrooms?",
-    options: ["Show top picks", "2+ bedrooms", "3+ bedrooms", "Schedule tours"],
+    text: "Got it! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
+  },
+  "$250k - $400k": {
+    text: "Great range! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
+  },
+  "$300k - $450k": {
+    text: "Great range! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
+  },
+  "$300k - $500k": {
+    text: "Great range! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
+  },
+  "$350k - $500k": {
+    text: "Great range! How many bedrooms do you need?",
+    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
+  },
+  "$400k - $550k": {
+    text: "Great range! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
   "$400k - $600k": {
-    text: "Great range! We have 83 stunning properties in this budget. This opens up neighborhoods like Downtown, Lakefront, and Cherry Hills. What's most important to you in a home?",
-    options: ["Modern updates", "Large yard", "Good schools", "Show me options"],
+    text: "Great range! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
+  },
+  "$450k - $600k": {
+    text: "Great range! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
+  },
+  "$500k - $700k": {
+    text: "Nice! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
+  },
+  "$500k - $750k": {
+    text: "Nice! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
+  },
+  "$550k+": {
+    text: "Nice! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
+  },
+  "$600k+": {
+    text: "Nice! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
   "$600k - $1m": {
-    text: "Excellent! In this range, you'll find premium homes in our most desirable neighborhoods. We have 52 listings with luxury features. Would you like me to show you our bestsellers?",
-    options: ["Show luxury homes", "Waterfront options", "New construction", "Schedule tours"],
+    text: "Excellent budget! How many bedrooms do you need?",
+    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
-  "over $1m": {
-    text: "You're looking at our premium collection! We have exclusive access to 28 luxury properties, including estates and waterfront homes. Would you like a private showing with our luxury specialist?",
-    options: ["View luxury collection", "Private showing", "Talk to specialist"],
+  "$700k+": {
+    text: "Excellent budget! How many bedrooms do you need?",
+    options: ["4 bedrooms", "5 bedrooms", "6+ bedrooms"],
   },
-  "show top picks": {
-    text: "Here are our top-rated properties that match your criteria. Each one has been hand-selected based on value, location, and features:",
+  "$750k+": {
+    text: "Excellent budget! How many bedrooms do you need?",
+    options: ["4 bedrooms", "5 bedrooms", "6+ bedrooms"],
+  },
+  "$1m+": {
+    text: "Luxury range! How many bedrooms do you need?",
+    options: ["4 bedrooms", "5 bedrooms", "6+ bedrooms"],
+  },
+
+  // Bedroom selections - show listings
+  "2 bedrooms": {
+    text: "Here are some 2-bedroom homes that match your criteria:",
     listings: mockListings,
   },
-  "show me options": {
-    text: "Here are some stunning homes in your price range. I've selected these based on the best value and most popular features:",
+  "3 bedrooms": {
+    text: "Here are some 3-bedroom homes that match your criteria:",
     listings: mockListings,
   },
-  "show luxury homes": {
-    text: "Here's our curated collection of luxury properties. These homes feature premium finishes, smart home technology, and prime locations:",
+  "4 bedrooms": {
+    text: "Here are some 4-bedroom homes that match your criteria:",
     listings: mockListings,
   },
-  "view luxury collection": {
-    text: "Our luxury collection features the finest estates in the area. Here are three standout properties:",
+  "4+ bedrooms": {
+    text: "Here are some 4+ bedroom homes that match your criteria:",
     listings: mockListings,
   },
-  "view featured listings": {
-    text: "Here are our featured listings - these properties are getting a lot of attention! Let me know if any catch your eye:",
+  "5 bedrooms": {
+    text: "Here are some 5-bedroom homes that match your criteria:",
     listings: mockListings,
   },
-  "schedule tours": {
-    text: "Great idea! Let me show you our available time slots. Pick a time that works for you and I'll confirm your showing:",
+  "5+ bedrooms": {
+    text: "Here are some 5+ bedroom homes that match your criteria:",
+    listings: mockListings,
+  },
+  "6+ bedrooms": {
+    text: "Here are our largest estate homes:",
+    listings: mockListings,
+  },
+
+  // Valuation flow
+  "get home valuation": {
+    text: "Great! Which area is your property located in?",
+    options: houstonAreas.slice(0, 4),
+  },
+
+  // Legacy support
+  "i'm looking to buy a home": {
+    text: "Great! Which area are you interested in?",
+    options: houstonAreas.slice(0, 4),
+  },
+  "i want to sell my property": {
+    text: "I can help with that! What would you like to do first?",
+    options: ["Get home valuation", "Talk to an agent"],
+  },
+  "schedule a showing": {
+    text: "I'd be happy to schedule a showing! When works best for you?",
     calendar: true,
   },
+  "schedule tours": {
+    text: "Great! When works best for you?",
+    calendar: true,
+  },
+  "view featured listings": {
+    text: "Here are our featured listings:",
+    listings: mockListings,
+  },
   default: {
-    text: "Thanks for your interest! I can help you with buying, selling, scheduling showings, or getting a home valuation. What would you like to explore?",
-    options: ["Buy a home", "Sell my home", "Schedule showing", "Home valuation"],
+    text: "I can help you with buying, selling, or talking to an agent. What would you like to do?",
+    options: ["Buy a home", "Sell my property", "Talk to an agent"],
   },
 };
 
@@ -200,6 +387,13 @@ export default function AIVAChat() {
   const [isCallActive, setIsCallActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [retellClient, setRetellClient] = useState<RetellWebClient | null>(null);
+
+  // Callback scheduling state
+  const [callbackPhone, setCallbackPhone] = useState("");
+  const [callbackName, setCallbackName] = useState("");
+  const [callbackEmail, setCallbackEmail] = useState("");
+  const [callbackMinutes, setCallbackMinutes] = useState(5);
+  const [isSchedulingCallback, setIsSchedulingCallback] = useState(false);
 
   // Initialize session ID on mount
   useEffect(() => {
@@ -328,6 +522,26 @@ export default function AIVAChat() {
 
     const lowerText = text.toLowerCase();
 
+    // Check for callback request first
+    const callbackCheck = isCallbackRequest(text);
+    if (callbackCheck.isCallback) {
+      // Set suggested minutes if extracted from message
+      if (callbackCheck.minutes) {
+        setCallbackMinutes(Math.min(Math.max(callbackCheck.minutes, 1), 60));
+      }
+
+      const callbackMessage: Message = {
+        id: messages.length + 2,
+        sender: "ai",
+        text: "I'd be happy to have someone call you back! Please enter your phone number below and select when you'd like us to call:",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        callbackForm: true,
+      };
+      setIsTyping(false);
+      setMessages((prev) => [...prev, callbackMessage]);
+      return;
+    }
+
     // Check for special UI triggers first (listings, calendar)
     let specialResponse: { text: string; options?: string[]; listings?: typeof mockListings; calendar?: boolean } | null = null;
 
@@ -335,8 +549,8 @@ export default function AIVAChat() {
     if (lowerText.includes("show") && (lowerText.includes("listing") || lowerText.includes("home") || lowerText.includes("properties") || lowerText.includes("picks") || lowerText.includes("options"))) {
       specialResponse = { text: "Here are some properties that match what you're looking for:", listings: mockListings };
     }
-    // Show calendar for scheduling queries
-    else if (lowerText.includes("schedule") || lowerText.includes("showing") || lowerText.includes("tour") || lowerText.includes("appointment")) {
+    // Show calendar for scheduling queries (but not "schedule a call" which is handled above)
+    else if ((lowerText.includes("schedule") || lowerText.includes("showing") || lowerText.includes("tour") || lowerText.includes("appointment")) && !lowerText.includes("call")) {
       specialResponse = { text: "I'd be happy to schedule a showing for you! Here are our available time slots:", calendar: true };
     }
 
@@ -355,7 +569,56 @@ export default function AIVAChat() {
       return;
     }
 
-    // Try Retell AI for dynamic responses
+    // Check local responses FIRST for guided flow
+    // Priority 1: Exact match (for button clicks)
+    // Priority 2: Keyword match (for typed text)
+    let localResponse: { text: string; options?: string[]; listings?: typeof mockListings; calendar?: boolean } | null = null;
+
+    // First try exact match
+    if (aiResponses[lowerText] && lowerText !== "default") {
+      localResponse = aiResponses[lowerText];
+    }
+
+    // If no exact match, try keyword matching for common intents
+    if (!localResponse) {
+      if (lowerText.includes("buy") || lowerText.includes("looking for a home") || lowerText.includes("find a home")) {
+        localResponse = aiResponses["buy a home"];
+      } else if (lowerText.includes("sell")) {
+        localResponse = aiResponses["sell my property"];
+      } else if (lowerText.includes("agent") || lowerText.includes("talk to") || lowerText.includes("speak")) {
+        localResponse = aiResponses["talk to an agent"];
+      } else if (lowerText.includes("valuation") || lowerText.includes("worth") || lowerText.includes("value")) {
+        localResponse = aiResponses["get home valuation"];
+      }
+      // Check for area names
+      else if (houstonAreas.some(area => lowerText.includes(area.toLowerCase()))) {
+        const matchedArea = houstonAreas.find(area => lowerText.includes(area.toLowerCase()));
+        if (matchedArea) {
+          localResponse = aiResponses[matchedArea.toLowerCase()];
+        }
+      }
+    }
+
+    // If we have a local response, use it (for guided button-based flow)
+    if (localResponse) {
+      const aiMessage: Message = {
+        id: messages.length + 2,
+        sender: "ai",
+        text: localResponse.text,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        options: localResponse.options,
+        listings: localResponse.listings,
+        calendar: localResponse.calendar,
+      };
+      setIsTyping(false);
+      setMessages((prev) => [...prev, aiMessage]);
+      return;
+    }
+
+    // Only call Retell AI for questions that truly don't match any local flow
+    // Skip Retell for now to ensure guided flow works
+    // Uncomment below to re-enable Retell for free-form questions
+    /*
     try {
       const response = await fetch("/api/retell/chat", {
         method: "POST",
@@ -383,15 +646,10 @@ export default function AIVAChat() {
     } catch (error) {
       console.error("Retell chat error:", error);
     }
+    */
 
-    // Fallback to rule-based responses if Retell fails
-    let response = aiResponses.default;
-    for (const key of Object.keys(aiResponses)) {
-      if (lowerText.includes(key)) {
-        response = aiResponses[key];
-        break;
-      }
-    }
+    // Fallback to default response
+    const response = aiResponses.default;
 
     const aiMessage: Message = {
       id: messages.length + 2,
@@ -468,6 +726,116 @@ export default function AIVAChat() {
       handleSendMessage("Schedule a showing");
     } else if (action === "listings") {
       handleSendMessage("View featured listings");
+    }
+  };
+
+  // Check if message is requesting a callback
+  const isCallbackRequest = (text: string): { isCallback: boolean; minutes?: number } => {
+    const lowerText = text.toLowerCase();
+
+    // Check for callback-related phrases
+    const callbackPhrases = [
+      "call me back",
+      "callback",
+      "call back",
+      "give me a call",
+      "call me in",
+      "call me later",
+      "schedule a call",
+      "schedule callback",
+      "have someone call",
+      "can you call me",
+      "please call me",
+      "request a call",
+      "want a call",
+      "need a call",
+    ];
+
+    const isCallback = callbackPhrases.some(phrase => lowerText.includes(phrase));
+
+    if (isCallback) {
+      // Try to extract minutes from the message
+      const minuteMatch = lowerText.match(/(\d+)\s*min/);
+      const hourMatch = lowerText.match(/(\d+)\s*hour/);
+
+      if (minuteMatch) {
+        return { isCallback: true, minutes: parseInt(minuteMatch[1]) };
+      } else if (hourMatch) {
+        return { isCallback: true, minutes: parseInt(hourMatch[1]) * 60 };
+      }
+
+      return { isCallback: true };
+    }
+
+    return { isCallback: false };
+  };
+
+  // Schedule a callback
+  const scheduleCallback = async (phoneNumber: string, delayMinutes: number, name?: string, email?: string) => {
+    setIsSchedulingCallback(true);
+
+    try {
+      const response = await fetch("/api/callbacks/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phoneNumber,
+          delayMinutes,
+          sessionId,
+          name: name || undefined,
+          email: email || undefined,
+          notes: `Requested via chat widget`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const leadInfo = data.data?.lead;
+        const displayName = name || phoneNumber;
+
+        const confirmMessage: Message = {
+          id: messages.length + 1,
+          sender: "ai",
+          text: leadInfo
+            ? `Thanks ${displayName}! I've scheduled a callback in ${delayMinutes} minute${delayMinutes > 1 ? 's' : ''}. You've also been added as a new lead in our system - our team can now follow up with you!`
+            : `I've scheduled a callback to ${phoneNumber} in ${delayMinutes} minute${delayMinutes > 1 ? 's' : ''}. Our agent will call you shortly and can transfer you to a live specialist if needed.`,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          callbackScheduled: {
+            phoneNumber,
+            delayMinutes,
+            lead: leadInfo,
+          },
+          options: ["View listings", "Get home valuation", "That's all, thanks!"],
+        };
+        setMessages((prev) => [...prev, confirmMessage]);
+        setCallbackPhone("");
+        setCallbackName("");
+        setCallbackEmail("");
+        setCallbackMinutes(5);
+      } else {
+        throw new Error(data.error || "Failed to schedule callback");
+      }
+    } catch (error) {
+      console.error("Error scheduling callback:", error);
+      const errorMessage: Message = {
+        id: messages.length + 1,
+        sender: "ai",
+        text: "I'm sorry, I couldn't schedule the callback right now. Would you like to try again or speak with us through the chat instead?",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        options: ["Try again", "Continue chatting"],
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsSchedulingCallback(false);
+    }
+  };
+
+  // Handle callback form submission
+  const handleCallbackSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (callbackPhone.trim().length >= 10) {
+      scheduleCallback(callbackPhone, callbackMinutes, callbackName, callbackEmail);
     }
   };
 
@@ -710,6 +1078,133 @@ export default function AIVAChat() {
                   <div className="mt-2 ml-10 flex items-center space-x-2 text-green-600 text-sm">
                     <CheckCircle className="w-4 h-4" />
                     <span>Voice call connected</span>
+                  </div>
+                )}
+
+                {/* Callback Scheduled Confirmation */}
+                {message.sender === "ai" && message.callbackScheduled && (
+                  <div className="mt-3 ml-10 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200">
+                    <div className="flex items-center space-x-2 text-emerald-700 mb-3">
+                      <CheckCircle className="w-5 h-5" />
+                      <span className="font-semibold">Callback Scheduled!</span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between text-gray-600">
+                        <span>Phone:</span>
+                        <span className="font-medium text-gray-900">{message.callbackScheduled.phoneNumber}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-gray-600">
+                        <span>Call in:</span>
+                        <span className="font-medium text-gray-900">{message.callbackScheduled.delayMinutes} min</span>
+                      </div>
+                    </div>
+
+                    {/* Lead Created Banner */}
+                    {message.callbackScheduled.lead && (
+                      <div className="mt-3 pt-3 border-t border-emerald-200">
+                        <div className="flex items-center space-x-2 text-emerald-700 mb-2">
+                          <UserPlus className="w-4 h-4" />
+                          <span className="text-xs font-semibold uppercase tracking-wide">New Lead Created</span>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-2">
+                          You&apos;ve been added as a new lead. Our team can now track and follow up with you.
+                        </p>
+                        <a
+                          href="/demo/admin"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center space-x-1 text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+                        >
+                          <span>View in Admin Dashboard</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Callback Scheduling Form */}
+                {message.sender === "ai" && message.callbackForm && (
+                  <div className="mt-3 ml-10 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <PhoneCall className="w-5 h-5 text-emerald-600" />
+                      <span className="font-semibold text-gray-900">Schedule a Callback</span>
+                    </div>
+                    <form onSubmit={handleCallbackSubmit} className="space-y-3">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 mb-1 block">Name</label>
+                          <input
+                            type="text"
+                            value={callbackName}
+                            onChange={(e) => setCallbackName(e.target.value)}
+                            placeholder="Your name"
+                            className="w-full px-3 py-2 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 border border-gray-200"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 mb-1 block">Email</label>
+                          <input
+                            type="email"
+                            value={callbackEmail}
+                            onChange={(e) => setCallbackEmail(e.target.value)}
+                            placeholder="you@email.com"
+                            className="w-full px-3 py-2 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 border border-gray-200"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 mb-1 block">Phone Number <span className="text-red-500">*</span></label>
+                        <input
+                          type="tel"
+                          value={callbackPhone}
+                          onChange={(e) => setCallbackPhone(e.target.value)}
+                          placeholder="(555) 123-4567"
+                          className="w-full px-3 py-2 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 border border-gray-200"
+                          required
+                          minLength={10}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 mb-1 block">Call me in</label>
+                        <div className="flex flex-wrap gap-2">
+                          {[5, 10, 15, 30, 60].map((mins) => (
+                            <button
+                              key={mins}
+                              type="button"
+                              onClick={() => setCallbackMinutes(mins)}
+                              className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                                callbackMinutes === mins
+                                  ? "bg-emerald-500 text-white"
+                                  : "bg-gray-100 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600"
+                              }`}
+                            >
+                              {mins < 60 ? `${mins} min` : "1 hour"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isSchedulingCallback || callbackPhone.trim().length < 10}
+                        className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      >
+                        {isSchedulingCallback ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Scheduling...</span>
+                          </>
+                        ) : (
+                          <>
+                            <PhoneCall className="w-4 h-4" />
+                            <span>Schedule Callback</span>
+                          </>
+                        )}
+                      </button>
+                      <p className="text-[10px] text-gray-400 text-center">
+                        You&apos;ll be added as a lead in our system
+                      </p>
+                    </form>
                   </div>
                 )}
 

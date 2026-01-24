@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -77,14 +77,78 @@ const mockListings = [
   },
 ];
 
+// Type for database leads
+interface DbLead {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  message: string | null;
+  source: string;
+  status: string;
+  preferred_contact: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Type for display leads (combines mock and real)
+interface DisplayLead {
+  id: string | number;
+  name: string;
+  email: string;
+  phone: string;
+  source: string;
+  status: string;
+  date: string;
+  hasAccount: boolean;
+  isVerified: boolean;
+  financing: string;
+  temperature: string;
+  isFromDatabase?: boolean;
+}
+
 // Mock data for leads with user account info and temperature
-const mockLeads = [
+const mockLeads: DisplayLead[] = [
   { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", source: "Lead Capture", status: "new", date: "2 hours ago", hasAccount: true, isVerified: false, financing: "pre-approved", temperature: "hot" },
   { id: 2, name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", source: "Phone Call", status: "contacted", date: "5 hours ago", hasAccount: true, isVerified: true, financing: "cash", temperature: "hot" },
   { id: 3, name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", source: "Contact Form", status: "qualified", date: "1 day ago", hasAccount: true, isVerified: false, financing: "working-with-lender", temperature: "warm" },
   { id: 4, name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", source: "Lead Capture", status: "new", date: "1 day ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
   { id: 5, name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", source: "Lead Capture", status: "converted", date: "2 days ago", hasAccount: true, isVerified: true, financing: "pre-qualified", temperature: "warm" },
 ];
+
+// Helper to format relative time
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  return date.toLocaleDateString();
+}
+
+// Convert database lead to display format
+function dbLeadToDisplay(lead: DbLead): DisplayLead {
+  return {
+    id: lead.id,
+    name: lead.name,
+    email: lead.email,
+    phone: lead.phone || "Not provided",
+    source: lead.source === 'chat' ? 'Chat Widget' : lead.source === 'contact_form' ? 'Contact Form' : lead.source,
+    status: lead.status,
+    date: formatRelativeTime(lead.created_at),
+    hasAccount: true,
+    isVerified: false,
+    financing: "exploring",
+    temperature: lead.status === 'new' ? 'hot' : lead.status === 'contacted' ? 'warm' : 'cold',
+    isFromDatabase: true,
+  };
+}
 
 // Mock data for captured users
 const mockUsers = [
@@ -195,6 +259,35 @@ const getFinancingLabel = (financing: string) => {
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [leads, setLeads] = useState<DisplayLead[]>(mockLeads);
+  const [isLoadingLeads, setIsLoadingLeads] = useState(true);
+
+  // Fetch real leads from database
+  useEffect(() => {
+    async function fetchLeads() {
+      try {
+        const response = await fetch('/api/leads?limit=20');
+        const data = await response.json();
+
+        if (data.success && data.data && data.data.length > 0) {
+          // Convert database leads to display format and prepend to mock leads
+          const dbLeads = data.data.map((lead: DbLead) => dbLeadToDisplay(lead));
+          // Put real leads first, then mock leads
+          setLeads([...dbLeads, ...mockLeads]);
+        }
+      } catch (error) {
+        console.error('Error fetching leads:', error);
+        // Keep mock leads on error
+      } finally {
+        setIsLoadingLeads(false);
+      }
+    }
+
+    fetchLeads();
+    // Poll for new leads every 10 seconds
+    const interval = setInterval(fetchLeads, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -315,11 +408,11 @@ export default function AdminDashboard() {
                   <Users className="w-4 h-4 md:w-6 md:h-6 text-blue-600" />
                 </div>
                 <span className="text-emerald-600 text-xs md:text-sm font-medium flex items-center">
-                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-0.5 md:mr-1" /> +28%
+                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-0.5 md:mr-1" /> +{leads.filter(l => l.isFromDatabase).length > 0 ? 'NEW' : '28%'}
                 </span>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900">47</h3>
-              <p className="text-gray-500 text-xs md:text-sm">New Leads</p>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">{leads.length}</h3>
+              <p className="text-gray-500 text-xs md:text-sm">Total Leads</p>
             </div>
 
             <div className="bg-white rounded-xl p-3 md:p-6 shadow-sm border border-gray-100">
@@ -479,12 +572,17 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100">
               <div className="p-4 md:p-6 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base md:text-lg font-bold text-gray-900">Recent Leads</h2>
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-base md:text-lg font-bold text-gray-900">Recent Leads</h2>
+                    {isLoadingLeads && (
+                      <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    )}
+                  </div>
                   <button className="text-emerald-600 text-xs md:text-sm font-medium hover:text-emerald-700">View All</button>
                 </div>
               </div>
               <div className="divide-y divide-gray-100">
-                {mockLeads.slice(0, 5).map((lead) => (
+                {leads.slice(0, 7).map((lead) => (
                   <div key={lead.id} className="p-3 md:p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
@@ -498,11 +596,16 @@ export default function AdminDashboard() {
                           {lead.name.split(" ").map(n => n[0]).join("")}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 flex-wrap gap-1">
                             <p className="font-medium text-gray-900 text-sm truncate">{lead.name}</p>
+                            {lead.isFromDatabase && (
+                              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-semibold rounded">NEW</span>
+                            )}
                             {getTemperatureBadge(lead.temperature)}
                           </div>
-                          <p className="text-[10px] md:text-xs text-gray-500 truncate">{getFinancingLabel(lead.financing)} • {lead.date}</p>
+                          <p className="text-[10px] md:text-xs text-gray-500 truncate">
+                            {lead.isFromDatabase ? lead.source : getFinancingLabel(lead.financing)} • {lead.date}
+                          </p>
                         </div>
                       </div>
                       <div className="flex-shrink-0">{getLeadStatusBadge(lead.status)}</div>

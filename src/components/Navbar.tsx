@@ -54,7 +54,7 @@ export default function Navbar() {
             </div>
             <div className="hidden sm:block">
               <span className="font-bold text-xl text-gray-900">Chatman</span>
-              <span className="font-light text-xl text-emerald-600"> Real Estate</span>
+              <span className="font-light text-xl text-emerald-600"> RP</span>
             </div>
           </Link>
 
