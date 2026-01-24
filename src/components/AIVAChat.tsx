@@ -91,20 +91,14 @@ const mockTimes = [
   { date: "Thursday", slots: ["10:00 AM", "1:00 PM", "5:00 PM"] },
 ];
 
-// Houston areas we cover
-const houstonAreas = [
-  "Katy",
-  "Sugar Land",
-  "The Woodlands",
-  "Pearland",
-  "Cypress",
-  "Spring",
-  "Humble",
-  "League City",
-  "Missouri City",
-  "Richmond",
-  "Friendswood",
-  "Tomball",
+// Areas we cover (matching demo listings)
+const demoAreas = [
+  "Oakwood",
+  "Downtown",
+  "Riverside",
+  "Tech Park",
+  "Beachfront",
+  "Pine Ridge",
 ];
 
 const initialMessages: Message[] = [
@@ -125,15 +119,7 @@ const aiResponses: { [key: string]: { text: string; options?: string[]; listings
   // Main menu
   "buy a home": {
     text: "Great! Which area are you interested in?",
-    options: houstonAreas.slice(0, 4), // Show first 4 areas
-  },
-  "more areas": {
-    text: "Here are more areas we cover:",
-    options: [...houstonAreas.slice(4, 8), "Even more areas"],
-  },
-  "even more areas": {
-    text: "And a few more options:",
-    options: houstonAreas.slice(8),
+    options: demoAreas,
   },
   "sell my property": {
     text: "I can help with that! What would you like to do first?",
@@ -153,131 +139,79 @@ const aiResponses: { [key: string]: { text: string; options?: string[]; listings
   },
 
   // Area selections - each leads to budget question
-  "katy": {
-    text: "Katy is a great choice! Excellent schools and family-friendly neighborhoods. What's your budget range?",
-    options: ["Under $300K", "$300K - $500K", "$500K - $750K", "$750K+"],
+  "oakwood": {
+    text: "Oakwood has beautiful lakefront properties! What's your budget range?",
+    options: ["Under $500K", "$500K - $750K", "$750K - $1M", "$1M+"],
   },
-  "sugar land": {
-    text: "Sugar Land has beautiful master-planned communities! What's your budget range?",
-    options: ["Under $300K", "$300K - $500K", "$500K - $750K", "$750K+"],
+  "downtown": {
+    text: "Downtown offers luxury urban living! What's your budget range?",
+    options: ["Under $500K", "$500K - $750K", "$750K - $1M", "$1M+"],
   },
-  "the woodlands": {
-    text: "The Woodlands offers luxury living with nature. What's your budget range?",
-    options: ["Under $400K", "$400K - $600K", "$600K - $1M", "$1M+"],
+  "riverside": {
+    text: "Riverside has charming colonial homes! What's your budget range?",
+    options: ["Under $500K", "$500K - $750K", "$750K - $1M", "$1M+"],
   },
-  "pearland": {
-    text: "Pearland is growing fast with great value! What's your budget range?",
-    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
+  "tech park": {
+    text: "Tech Park features modern smart homes! What's your budget range?",
+    options: ["Under $500K", "$500K - $750K", "$750K - $1M", "$1M+"],
   },
-  "cypress": {
-    text: "Cypress has excellent schools and new construction. What's your budget range?",
-    options: ["Under $300K", "$300K - $500K", "$500K - $750K", "$750K+"],
+  "beachfront": {
+    text: "Beachfront offers stunning ocean views! What's your budget range?",
+    options: ["$500K - $1M", "$1M - $1.5M", "$1.5M - $2M", "$2M+"],
   },
-  "spring": {
-    text: "Spring offers great access to downtown and The Woodlands. What's your budget range?",
-    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
-  },
-  "humble": {
-    text: "Humble has affordable options and is growing! What's your budget range?",
-    options: ["Under $250K", "$250K - $400K", "$400K - $550K", "$550K+"],
-  },
-  "league city": {
-    text: "League City is perfect for families near the bay. What's your budget range?",
-    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
-  },
-  "missouri city": {
-    text: "Missouri City offers great value close to the city. What's your budget range?",
-    options: ["Under $250K", "$250K - $400K", "$400K - $550K", "$550K+"],
-  },
-  "richmond": {
-    text: "Richmond has charming neighborhoods and new developments. What's your budget range?",
-    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
-  },
-  "friendswood": {
-    text: "Friendswood is known for top-rated schools! What's your budget range?",
-    options: ["Under $350K", "$350K - $500K", "$500K - $700K", "$700K+"],
-  },
-  "tomball": {
-    text: "Tomball has that small-town feel with big-city access. What's your budget range?",
-    options: ["Under $300K", "$300K - $450K", "$450K - $600K", "$600K+"],
+  "pine ridge": {
+    text: "Pine Ridge has cozy mountain retreats! What's your budget range?",
+    options: ["Under $400K", "$400K - $600K", "$600K - $800K", "$800K+"],
   },
 
   // Budget selections - lead to bedroom question
-  "under $250k": {
-    text: "Got it! How many bedrooms do you need?",
-    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
-  },
-  "under $300k": {
-    text: "Got it! How many bedrooms do you need?",
-    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
-  },
-  "under $350k": {
-    text: "Got it! How many bedrooms do you need?",
-    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
-  },
   "under $400k": {
     text: "Got it! How many bedrooms do you need?",
     options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
   },
-  "$250k - $400k": {
-    text: "Great range! How many bedrooms do you need?",
+  "under $500k": {
+    text: "Got it! How many bedrooms do you need?",
     options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
-  },
-  "$300k - $450k": {
-    text: "Great range! How many bedrooms do you need?",
-    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
-  },
-  "$300k - $500k": {
-    text: "Great range! How many bedrooms do you need?",
-    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
-  },
-  "$350k - $500k": {
-    text: "Great range! How many bedrooms do you need?",
-    options: ["2 bedrooms", "3 bedrooms", "4+ bedrooms"],
-  },
-  "$400k - $550k": {
-    text: "Great range! How many bedrooms do you need?",
-    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
   "$400k - $600k": {
     text: "Great range! How many bedrooms do you need?",
     options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
-  "$450k - $600k": {
+  "$500k - $750k": {
     text: "Great range! How many bedrooms do you need?",
     options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
-  "$500k - $700k": {
+  "$500k - $1m": {
     text: "Nice! How many bedrooms do you need?",
     options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
-  "$500k - $750k": {
+  "$600k - $800k": {
     text: "Nice! How many bedrooms do you need?",
     options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
   },
-  "$550k+": {
-    text: "Nice! How many bedrooms do you need?",
-    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
-  },
-  "$600k+": {
-    text: "Nice! How many bedrooms do you need?",
-    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
-  },
-  "$600k - $1m": {
-    text: "Excellent budget! How many bedrooms do you need?",
-    options: ["3 bedrooms", "4 bedrooms", "5+ bedrooms"],
-  },
-  "$700k+": {
+  "$750k - $1m": {
     text: "Excellent budget! How many bedrooms do you need?",
     options: ["4 bedrooms", "5 bedrooms", "6+ bedrooms"],
   },
-  "$750k+": {
+  "$800k+": {
     text: "Excellent budget! How many bedrooms do you need?",
     options: ["4 bedrooms", "5 bedrooms", "6+ bedrooms"],
   },
   "$1m+": {
     text: "Luxury range! How many bedrooms do you need?",
     options: ["4 bedrooms", "5 bedrooms", "6+ bedrooms"],
+  },
+  "$1m - $1.5m": {
+    text: "Luxury range! How many bedrooms do you need?",
+    options: ["4 bedrooms", "5 bedrooms", "6+ bedrooms"],
+  },
+  "$1.5m - $2m": {
+    text: "Premium luxury! How many bedrooms do you need?",
+    options: ["5 bedrooms", "6 bedrooms", "7+ bedrooms"],
+  },
+  "$2m+": {
+    text: "Ultra luxury! How many bedrooms do you need?",
+    options: ["5 bedrooms", "6 bedrooms", "7+ bedrooms"],
   },
 
   // Bedroom selections - show listings
@@ -305,21 +239,29 @@ const aiResponses: { [key: string]: { text: string; options?: string[]; listings
     text: "Here are some 5+ bedroom homes that match your criteria:",
     listings: mockListings,
   },
+  "6 bedrooms": {
+    text: "Here are some 6-bedroom homes that match your criteria:",
+    listings: mockListings,
+  },
   "6+ bedrooms": {
     text: "Here are our largest estate homes:",
+    listings: mockListings,
+  },
+  "7+ bedrooms": {
+    text: "Here are our grandest estate homes:",
     listings: mockListings,
   },
 
   // Valuation flow
   "get home valuation": {
     text: "Great! Which area is your property located in?",
-    options: houstonAreas.slice(0, 4),
+    options: demoAreas,
   },
 
   // Legacy support
   "i'm looking to buy a home": {
     text: "Great! Which area are you interested in?",
-    options: houstonAreas.slice(0, 4),
+    options: demoAreas,
   },
   "i want to sell my property": {
     text: "I can help with that! What would you like to do first?",
@@ -591,8 +533,8 @@ export default function AIVAChat() {
         localResponse = aiResponses["get home valuation"];
       }
       // Check for area names
-      else if (houstonAreas.some(area => lowerText.includes(area.toLowerCase()))) {
-        const matchedArea = houstonAreas.find(area => lowerText.includes(area.toLowerCase()));
+      else if (demoAreas.some(area => lowerText.includes(area.toLowerCase()))) {
+        const matchedArea = demoAreas.find(area => lowerText.includes(area.toLowerCase()));
         if (matchedArea) {
           localResponse = aiResponses[matchedArea.toLowerCase()];
         }
