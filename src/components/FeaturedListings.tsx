@@ -199,7 +199,7 @@ const listings = [
     tag: "Mountain Views",
     tagColor: "bg-emerald-500",
   },
-  // Commercial Property
+  // Commercial Properties - one per area
   {
     id: 17,
     title: "Prime Retail Space",
@@ -209,9 +209,137 @@ const listings = [
     baths: 2,
     sqft: 3500,
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
-    tag: "Commercial",
+    tag: "Retail",
     tagColor: "bg-gray-700",
     isCommercial: true,
+    commercialType: "Retail",
+  },
+  {
+    id: 18,
+    title: "Industrial Warehouse",
+    address: "5500 Industrial Blvd, Tech Park",
+    price: 1250000,
+    beds: 0,
+    baths: 2,
+    sqft: 15000,
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
+    tag: "Warehouse",
+    tagColor: "bg-slate-600",
+    isCommercial: true,
+    commercialType: "Warehouse",
+  },
+  {
+    id: 19,
+    title: "Luxury Apartment Complex",
+    address: "200 Lakeview Circle, Oakwood",
+    price: 4500000,
+    beds: 0,
+    baths: 0,
+    sqft: 45000,
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80",
+    tag: "Multi-Family",
+    tagColor: "bg-violet-600",
+    isCommercial: true,
+    commercialType: "Apartment Building",
+    units: 24,
+  },
+  {
+    id: 20,
+    title: "Riverside Shopping Center",
+    address: "750 River Road, Riverside",
+    price: 3200000,
+    beds: 0,
+    baths: 6,
+    sqft: 28000,
+    image: "https://images.unsplash.com/photo-1567449303078-57ad995bd329?w=600&q=80",
+    tag: "Shopping Center",
+    tagColor: "bg-fuchsia-600",
+    isCommercial: true,
+    commercialType: "Shopping Center",
+  },
+  {
+    id: 21,
+    title: "Class A Office Building",
+    address: "100 Executive Plaza, Downtown",
+    price: 5800000,
+    beds: 0,
+    baths: 12,
+    sqft: 35000,
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
+    tag: "Office",
+    tagColor: "bg-blue-700",
+    isCommercial: true,
+    commercialType: "Office Building",
+  },
+  {
+    id: 22,
+    title: "Turnkey Restaurant",
+    address: "888 Oceanfront Walk, Beachfront",
+    price: 950000,
+    beds: 0,
+    baths: 4,
+    sqft: 4200,
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80",
+    tag: "Restaurant",
+    tagColor: "bg-amber-600",
+    isCommercial: true,
+    commercialType: "Restaurant",
+  },
+  {
+    id: 23,
+    title: "Express Car Wash",
+    address: "300 Highway 59, Pine Ridge",
+    price: 1100000,
+    beds: 0,
+    baths: 2,
+    sqft: 5500,
+    image: "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=600&q=80",
+    tag: "Car Wash",
+    tagColor: "bg-cyan-600",
+    isCommercial: true,
+    commercialType: "Car Wash",
+  },
+  {
+    id: 24,
+    title: "Medical Office Building",
+    address: "450 Healthcare Way, Riverside",
+    price: 2800000,
+    beds: 0,
+    baths: 8,
+    sqft: 12000,
+    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80",
+    tag: "Medical",
+    tagColor: "bg-red-600",
+    isCommercial: true,
+    commercialType: "Medical Office",
+  },
+  {
+    id: 25,
+    title: "Self-Storage Facility",
+    address: "600 Storage Lane, Tech Park",
+    price: 1850000,
+    beds: 0,
+    baths: 1,
+    sqft: 25000,
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+    tag: "Storage",
+    tagColor: "bg-orange-600",
+    isCommercial: true,
+    commercialType: "Self-Storage",
+  },
+  {
+    id: 26,
+    title: "Gas Station & Convenience",
+    address: "1200 Main Highway, Oakwood",
+    price: 1650000,
+    beds: 0,
+    baths: 2,
+    sqft: 3200,
+    image: "https://images.unsplash.com/photo-1565620731358-e8c038abc8d1?w=600&q=80",
+    tag: "Gas Station",
+    tagColor: "bg-yellow-600",
+    isCommercial: true,
+    commercialType: "Gas Station",
   },
 ];
 
@@ -313,12 +441,18 @@ export default function FeaturedListings() {
                         <Square className="w-5 h-5" />
                         <span className="text-sm font-medium">{listing.sqft.toLocaleString()} sqft</span>
                       </div>
-                      <div className="flex items-center space-x-1 text-gray-600">
-                        <Bath className="w-5 h-5" />
-                        <span className="text-sm font-medium">{listing.baths} Baths</span>
-                      </div>
+                      {"units" in listing && listing.units ? (
+                        <div className="flex items-center space-x-1 text-gray-600">
+                          <span className="text-sm font-medium">{listing.units} Units</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-1 text-gray-600">
+                          <Bath className="w-5 h-5" />
+                          <span className="text-sm font-medium">{listing.baths} Bath{listing.baths !== 1 ? 's' : ''}</span>
+                        </div>
+                      )}
                       <div className="flex items-center space-x-1 text-gray-700 font-semibold">
-                        <span className="text-sm">Commercial</span>
+                        <span className="text-sm">{"commercialType" in listing ? listing.commercialType : "Commercial"}</span>
                       </div>
                     </>
                   ) : (

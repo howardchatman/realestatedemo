@@ -47,7 +47,7 @@ interface Message {
   callbackScheduled?: { phoneNumber: string; delayMinutes: number; lead?: LeadInfo };
 }
 
-// Mock listings data - variety of price points
+// Mock residential listings - variety of price points
 const mockListings = [
   {
     id: 1,
@@ -84,6 +84,53 @@ const mockListings = [
   },
 ];
 
+// Mock commercial listings
+const mockCommercialListings = [
+  {
+    id: 17,
+    title: "Prime Retail Space",
+    address: "1000 Commerce Drive, Downtown",
+    price: 750000,
+    beds: 0,
+    baths: 2,
+    sqft: 3500,
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80",
+    tag: "Retail",
+  },
+  {
+    id: 18,
+    title: "Industrial Warehouse",
+    address: "5500 Industrial Blvd, Tech Park",
+    price: 1250000,
+    beds: 0,
+    baths: 2,
+    sqft: 15000,
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80",
+    tag: "Warehouse",
+  },
+  {
+    id: 22,
+    title: "Turnkey Restaurant",
+    address: "888 Oceanfront Walk, Beachfront",
+    price: 950000,
+    beds: 0,
+    baths: 4,
+    sqft: 4200,
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    tag: "Restaurant",
+  },
+];
+
+// Commercial property types
+const commercialTypes = [
+  "Retail Space",
+  "Warehouse",
+  "Office Building",
+  "Restaurant",
+  "Multi-Family",
+  "Other Commercial",
+];
+
 // Mock available times
 const mockTimes = [
   { date: "Tomorrow", slots: ["10:00 AM", "2:00 PM", "4:30 PM"] },
@@ -105,10 +152,11 @@ const initialMessages: Message[] = [
   {
     id: 1,
     sender: "ai",
-    text: "Hi! I'm AIVA, your AI real estate assistant. I'm here 24/7 to help you find your perfect home. What can I help you with?",
+    text: "Hi! I'm AIVA, your AI real estate assistant. I'm here 24/7 to help you with residential and commercial properties. What can I help you with?",
     time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     options: [
       "Buy a home",
+      "Commercial property",
       "Sell my property",
       "Talk to an agent",
     ],
@@ -120,6 +168,10 @@ const aiResponses: { [key: string]: { text: string; options?: string[]; listings
   "buy a home": {
     text: "Great! Which area are you interested in?",
     options: demoAreas,
+  },
+  "commercial property": {
+    text: "Looking for commercial real estate! What type of property are you interested in?",
+    options: commercialTypes,
   },
   "sell my property": {
     text: "I can help with that! What would you like to do first?",
@@ -136,6 +188,32 @@ const aiResponses: { [key: string]: { text: string; options?: string[]; listings
   "request callback now": {
     text: "I'd be happy to have someone call you back! Please enter your phone number below:",
     options: [], // This triggers the callback form via isCallbackRequest
+  },
+
+  // Commercial property types
+  "retail space": {
+    text: "Here are our available retail spaces:",
+    listings: mockCommercialListings,
+  },
+  "warehouse": {
+    text: "Here are our warehouse and industrial properties:",
+    listings: mockCommercialListings,
+  },
+  "office building": {
+    text: "Here are our office buildings:",
+    listings: mockCommercialListings,
+  },
+  "restaurant": {
+    text: "Here are our restaurant properties:",
+    listings: mockCommercialListings,
+  },
+  "multi-family": {
+    text: "Here are our multi-family and apartment buildings:",
+    listings: mockCommercialListings,
+  },
+  "other commercial": {
+    text: "Here are other commercial properties including car washes, gas stations, and storage facilities:",
+    listings: mockCommercialListings,
   },
 
   // Area selections - each leads to budget question
@@ -523,7 +601,24 @@ export default function AIVAChat() {
 
     // If no exact match, try keyword matching for common intents
     if (!localResponse) {
-      if (lowerText.includes("buy") || lowerText.includes("looking for a home") || lowerText.includes("find a home")) {
+      // Commercial keywords - check first since "buy" might also be in commercial queries
+      if (lowerText.includes("commercial") || lowerText.includes("business") || lowerText.includes("invest")) {
+        localResponse = aiResponses["commercial property"];
+      } else if (lowerText.includes("warehouse") || lowerText.includes("industrial")) {
+        localResponse = aiResponses["warehouse"];
+      } else if (lowerText.includes("retail") || lowerText.includes("store") || lowerText.includes("shop")) {
+        localResponse = aiResponses["retail space"];
+      } else if (lowerText.includes("office")) {
+        localResponse = aiResponses["office building"];
+      } else if (lowerText.includes("restaurant") || lowerText.includes("food")) {
+        localResponse = aiResponses["restaurant"];
+      } else if (lowerText.includes("apartment") || lowerText.includes("multi-family") || lowerText.includes("multifamily")) {
+        localResponse = aiResponses["multi-family"];
+      } else if (lowerText.includes("car wash") || lowerText.includes("gas station") || lowerText.includes("storage")) {
+        localResponse = aiResponses["other commercial"];
+      }
+      // Residential keywords
+      else if (lowerText.includes("buy") || lowerText.includes("looking for a home") || lowerText.includes("find a home") || lowerText.includes("house")) {
         localResponse = aiResponses["buy a home"];
       } else if (lowerText.includes("sell")) {
         localResponse = aiResponses["sell my property"];

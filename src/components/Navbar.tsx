@@ -32,7 +32,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Buy", href: "/listings" },
     { name: "Sell", href: "/#valuation" },
-    { name: "Home Value", href: "/#valuation" },
+    { name: "Commercial", href: "/listings?type=commercial" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/#contact" },
   ];
