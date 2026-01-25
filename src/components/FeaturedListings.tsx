@@ -5,8 +5,142 @@ import Link from "next/link";
 import { Heart, BedDouble, Bath, Square, MapPin, ArrowRight } from "lucide-react";
 
 const listings = [
+  // Affordable homes under $500K
   {
     id: 1,
+    title: "Starter Home with Charm",
+    address: "142 Maple Lane, Riverside",
+    price: 285000,
+    beds: 3,
+    baths: 2,
+    sqft: 1450,
+    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80",
+    tag: "Great Value",
+    tagColor: "bg-green-500",
+  },
+  {
+    id: 2,
+    title: "Updated Ranch Style",
+    address: "567 Cedar Court, Oakwood",
+    price: 325000,
+    beds: 3,
+    baths: 2,
+    sqft: 1650,
+    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=80",
+    tag: "Move-In Ready",
+    tagColor: "bg-blue-500",
+  },
+  {
+    id: 3,
+    title: "Cozy Craftsman Bungalow",
+    address: "234 Birch Street, Pine Ridge",
+    price: 349000,
+    beds: 2,
+    baths: 1,
+    sqft: 1200,
+    image: "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80",
+    tag: "Charming",
+    tagColor: "bg-amber-500",
+  },
+  {
+    id: 4,
+    title: "Modern Townhome",
+    address: "789 Urban Way, Downtown",
+    price: 375000,
+    beds: 2,
+    baths: 2,
+    sqft: 1350,
+    image: "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=600&q=80",
+    tag: "New Listing",
+    tagColor: "bg-emerald-500",
+  },
+  {
+    id: 5,
+    title: "Family-Friendly Split Level",
+    address: "456 Willow Drive, Riverside",
+    price: 389000,
+    beds: 4,
+    baths: 2,
+    sqft: 1800,
+    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&q=80",
+    tag: "Spacious",
+    tagColor: "bg-indigo-500",
+  },
+  {
+    id: 6,
+    title: "Renovated Colonial",
+    address: "321 Heritage Lane, Oakwood",
+    price: 425000,
+    beds: 3,
+    baths: 2,
+    sqft: 1750,
+    image: "https://images.unsplash.com/photo-1598228723793-52759bba239c?w=600&q=80",
+    tag: "Updated",
+    tagColor: "bg-teal-500",
+  },
+  {
+    id: 7,
+    title: "Sunny Corner Lot Home",
+    address: "890 Sunset Blvd, Pine Ridge",
+    price: 445000,
+    beds: 3,
+    baths: 2,
+    sqft: 1600,
+    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=80",
+    tag: "Corner Lot",
+    tagColor: "bg-orange-500",
+  },
+  {
+    id: 8,
+    title: "Contemporary Condo",
+    address: "100 City Center, Unit 405",
+    price: 299000,
+    beds: 1,
+    baths: 1,
+    sqft: 850,
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80",
+    tag: "Low HOA",
+    tagColor: "bg-cyan-500",
+  },
+  {
+    id: 9,
+    title: "Brick Traditional",
+    address: "555 Oak Park Ave, Riverside",
+    price: 465000,
+    beds: 4,
+    baths: 3,
+    sqft: 2100,
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80",
+    tag: "Classic",
+    tagColor: "bg-rose-500",
+  },
+  {
+    id: 10,
+    title: "First-Time Buyer Special",
+    address: "678 Starter Street, Tech Park",
+    price: 275000,
+    beds: 2,
+    baths: 1,
+    sqft: 1100,
+    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80",
+    tag: "Affordable",
+    tagColor: "bg-lime-500",
+  },
+  {
+    id: 11,
+    title: "Garden District Gem",
+    address: "432 Rose Garden Way, Oakwood",
+    price: 485000,
+    beds: 3,
+    baths: 2,
+    sqft: 1900,
+    image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&q=80",
+    tag: "Beautiful Yard",
+    tagColor: "bg-pink-500",
+  },
+  // Mid-range and luxury homes
+  {
+    id: 12,
     title: "Modern Lakefront Estate",
     address: "123 Lakeview Drive, Oakwood",
     price: 1250000,
@@ -14,11 +148,11 @@ const listings = [
     baths: 4,
     sqft: 4200,
     image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80",
-    tag: "New Listing",
-    tagColor: "bg-emerald-500",
+    tag: "Luxury",
+    tagColor: "bg-purple-500",
   },
   {
-    id: 2,
+    id: 13,
     title: "Downtown Luxury Penthouse",
     address: "456 Main Street, Unit PH1",
     price: 895000,
@@ -30,7 +164,7 @@ const listings = [
     tagColor: "bg-blue-500",
   },
   {
-    id: 3,
+    id: 14,
     title: "Charming Colonial Home",
     address: "789 Oak Street, Riverside",
     price: 675000,
@@ -42,31 +176,19 @@ const listings = [
     tagColor: "bg-orange-500",
   },
   {
-    id: 4,
-    title: "Contemporary Smart Home",
-    address: "321 Tech Park Lane",
-    price: 785000,
-    beds: 4,
-    baths: 3,
-    sqft: 3100,
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80",
-    tag: "Price Reduced",
-    tagColor: "bg-red-500",
-  },
-  {
-    id: 5,
+    id: 15,
     title: "Beachfront Paradise",
-    address: "555 Ocean Boulevard",
+    address: "555 Ocean Boulevard, Beachfront",
     price: 2100000,
     beds: 6,
     baths: 5,
     sqft: 5500,
     image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&q=80",
-    tag: "Luxury",
-    tagColor: "bg-purple-500",
+    tag: "Waterfront",
+    tagColor: "bg-sky-500",
   },
   {
-    id: 6,
+    id: 16,
     title: "Cozy Mountain Retreat",
     address: "888 Pine Ridge Road",
     price: 525000,
@@ -74,8 +196,22 @@ const listings = [
     baths: 2,
     sqft: 1850,
     image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&q=80",
-    tag: "New Listing",
+    tag: "Mountain Views",
     tagColor: "bg-emerald-500",
+  },
+  // Commercial Property
+  {
+    id: 17,
+    title: "Prime Retail Space",
+    address: "1000 Commerce Drive, Downtown",
+    price: 750000,
+    beds: 0,
+    baths: 2,
+    sqft: 3500,
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
+    tag: "Commercial",
+    tagColor: "bg-gray-700",
+    isCommercial: true,
   },
 ];
 
@@ -171,18 +307,36 @@ export default function FeaturedListings() {
 
                 {/* Features */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div className="flex items-center space-x-1 text-gray-600">
-                    <BedDouble className="w-5 h-5" />
-                    <span className="text-sm font-medium">{listing.beds} Beds</span>
-                  </div>
-                  <div className="flex items-center space-x-1 text-gray-600">
-                    <Bath className="w-5 h-5" />
-                    <span className="text-sm font-medium">{listing.baths} Baths</span>
-                  </div>
-                  <div className="flex items-center space-x-1 text-gray-600">
-                    <Square className="w-5 h-5" />
-                    <span className="text-sm font-medium">{listing.sqft.toLocaleString()} sqft</span>
-                  </div>
+                  {"isCommercial" in listing && listing.isCommercial ? (
+                    <>
+                      <div className="flex items-center space-x-1 text-gray-600">
+                        <Square className="w-5 h-5" />
+                        <span className="text-sm font-medium">{listing.sqft.toLocaleString()} sqft</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-gray-600">
+                        <Bath className="w-5 h-5" />
+                        <span className="text-sm font-medium">{listing.baths} Baths</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-gray-700 font-semibold">
+                        <span className="text-sm">Commercial</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center space-x-1 text-gray-600">
+                        <BedDouble className="w-5 h-5" />
+                        <span className="text-sm font-medium">{listing.beds} Beds</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-gray-600">
+                        <Bath className="w-5 h-5" />
+                        <span className="text-sm font-medium">{listing.baths} Baths</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-gray-600">
+                        <Square className="w-5 h-5" />
+                        <span className="text-sm font-medium">{listing.sqft.toLocaleString()} sqft</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* View Details Button */}

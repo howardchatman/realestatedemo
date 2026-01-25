@@ -47,40 +47,40 @@ interface Message {
   callbackScheduled?: { phoneNumber: string; delayMinutes: number; lead?: LeadInfo };
 }
 
-// Mock listings data
+// Mock listings data - variety of price points
 const mockListings = [
   {
     id: 1,
-    title: "Modern Lakefront Estate",
-    address: "123 Lakeview Drive",
-    price: 1250000,
-    beds: 5,
-    baths: 4,
-    sqft: 4200,
-    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&q=80",
-    tag: "New Listing",
+    title: "Starter Home with Charm",
+    address: "142 Maple Lane, Riverside",
+    price: 285000,
+    beds: 3,
+    baths: 2,
+    sqft: 1450,
+    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80",
+    tag: "Great Value",
   },
   {
     id: 2,
-    title: "Downtown Luxury Penthouse",
-    address: "456 Main Street",
-    price: 895000,
+    title: "Updated Ranch Style",
+    address: "567 Cedar Court, Oakwood",
+    price: 325000,
     beds: 3,
     baths: 2,
-    sqft: 2100,
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80",
-    tag: "Featured",
+    sqft: 1650,
+    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80",
+    tag: "Move-In Ready",
   },
   {
     id: 3,
-    title: "Charming Colonial Home",
-    address: "789 Oak Street",
-    price: 675000,
+    title: "Family-Friendly Split Level",
+    address: "456 Willow Drive, Riverside",
+    price: 389000,
     beds: 4,
-    baths: 3,
-    sqft: 2800,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80",
-    tag: "Open House",
+    baths: 2,
+    sqft: 1800,
+    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=400&q=80",
+    tag: "Spacious",
   },
 ];
 
