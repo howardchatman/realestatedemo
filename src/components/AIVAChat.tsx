@@ -652,12 +652,9 @@ export default function AIVAChat() {
       return;
     }
 
-    // Only call Retell AI for questions that truly don't match any local flow
-    // Skip Retell for now to ensure guided flow works
-    // Uncomment below to re-enable Retell for free-form questions
-    /*
+    // Try smart chat for complex questions (comparisons, market analysis, neighborhood insights)
     try {
-      const response = await fetch("/api/retell/chat", {
+      const smartResponse = await fetch("/api/ai/smart-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -667,23 +664,25 @@ export default function AIVAChat() {
         }),
       });
 
-      const data = await response.json();
+      const smartData = await smartResponse.json();
 
-      if (data.success && data.data?.response) {
+      // If it's a complex question and we got a response, use it
+      if (smartData.success && smartData.data?.isComplex && smartData.data?.response) {
         const aiMessage: Message = {
           id: messages.length + 2,
           sender: "ai",
-          text: data.data.response,
+          text: smartData.data.response,
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          options: ["View listings", "Schedule a showing", "Talk to an agent"],
         };
         setIsTyping(false);
         setMessages((prev) => [...prev, aiMessage]);
         return;
       }
     } catch (error) {
-      console.error("Retell chat error:", error);
+      console.error("Smart chat error:", error);
+      // Fall through to default response
     }
-    */
 
     // Fallback to default response
     const response = aiResponses.default;
