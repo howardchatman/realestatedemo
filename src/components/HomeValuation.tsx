@@ -2,21 +2,39 @@
 
 import { useState } from "react";
 import { Home, MapPin, TrendingUp, DollarSign, Check, Sparkles } from "lucide-react";
+import { useValuation } from "@/hooks/useValuation";
+import ValuationLeadModal from "./ValuationLeadModal";
 
 export default function HomeValuation() {
   const [address, setAddress] = useState("");
-  const [showResult, setShowResult] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const {
+    valuation,
+    isLoading,
+    error,
+    fetchValuation,
+    submitWithLead,
+    reset,
+  } = useValuation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (address) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        setShowResult(true);
-      }, 2000);
+      const result = await fetchValuation(address);
+      if (result) {
+        // Auto-open lead modal after 2 seconds
+        setTimeout(() => setShowLeadModal(true), 2000);
+      }
     }
+  };
+
+  const handleReset = () => {
+    reset();
+    setAddress("");
+  };
+
+  const handleLeadSubmit = async (leadData: { name: string; email: string; phone: string }) => {
+    return await submitWithLead(leadData);
   };
 
   return (
@@ -80,7 +98,7 @@ export default function HomeValuation() {
           {/* Right - Valuation Form */}
           <div>
             <div className="bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 rounded-3xl p-8 shadow-2xl">
-              {!showResult ? (
+              {!valuation ? (
                 <>
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mx-auto mb-4">
@@ -107,15 +125,19 @@ export default function HomeValuation() {
                       />
                     </div>
 
+                    {error && (
+                      <p className="text-red-400 text-sm text-center">{error}</p>
+                    )}
+
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full py-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-emerald-500/25 transition-all flex items-center justify-center space-x-2"
+                      className="w-full py-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-emerald-500/25 transition-all flex items-center justify-center space-x-2 disabled:opacity-70"
                     >
                       {isLoading ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>Analyzing...</span>
+                          <span>Analyzing Market Data...</span>
                         </>
                       ) : (
                         <>
@@ -140,39 +162,55 @@ export default function HomeValuation() {
                   <h3 className="text-xl text-white/70 mb-2">
                     Your Estimated Home Value
                   </h3>
-                  <div className="text-5xl font-bold text-white mb-4">
-                    $685,000
+                  <div className="text-5xl font-bold text-white mb-2">
+                    {valuation.formatted.estimated}
                   </div>
-                  <div className="text-emerald-400 font-medium mb-8">
-                    +5.2% from last year
+                  <div className="flex items-center justify-center gap-1 text-emerald-400 font-medium mb-2">
+                    <TrendingUp className="w-4 h-4" />
+                    <span>{valuation.formatted.trend} from last year</span>
                   </div>
+                  <p className="text-white/50 text-sm mb-6">
+                    Based on {valuation.comparable_count} similar properties
+                  </p>
 
                   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6">
                     <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
-                        <div className="text-2xl font-bold text-white">$650K</div>
+                        <div className="text-2xl font-bold text-white">{valuation.formatted.low}</div>
                         <div className="text-white/60 text-sm">Low Estimate</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-emerald-400">$685K</div>
+                        <div className="text-2xl font-bold text-emerald-400">{valuation.formatted.estimated}</div>
                         <div className="text-white/60 text-sm">Estimate</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-white">$720K</div>
+                        <div className="text-2xl font-bold text-white">{valuation.formatted.high}</div>
                         <div className="text-white/60 text-sm">High Estimate</div>
                       </div>
                     </div>
                   </div>
 
-                  <button className="w-full py-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all mb-4">
+                  <div className="mb-4">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      valuation.confidence === 'high'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : valuation.confidence === 'medium'
+                        ? 'bg-yellow-500/20 text-yellow-400'
+                        : 'bg-gray-500/20 text-gray-400'
+                    }`}>
+                      {valuation.confidence.charAt(0).toUpperCase() + valuation.confidence.slice(1)} Confidence
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => setShowLeadModal(true)}
+                    className="w-full py-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all mb-4"
+                  >
                     Get Full Report
                   </button>
 
                   <button
-                    onClick={() => {
-                      setShowResult(false);
-                      setAddress("");
-                    }}
+                    onClick={handleReset}
                     className="text-white/60 hover:text-white transition-colors text-sm"
                   >
                     Try another address
@@ -183,6 +221,17 @@ export default function HomeValuation() {
           </div>
         </div>
       </div>
+
+      {/* Valuation Lead Modal */}
+      {valuation && (
+        <ValuationLeadModal
+          isOpen={showLeadModal}
+          onClose={() => setShowLeadModal(false)}
+          onSubmit={handleLeadSubmit}
+          valuation={valuation}
+          address={address}
+        />
+      )}
     </section>
   );
 }

@@ -27,6 +27,13 @@ import {
   Filter,
   Menu,
   X,
+  FileText,
+  DollarSign,
+  Wrench,
+  AlertTriangle,
+  Send,
+  CreditCard,
+  Building,
 } from "lucide-react";
 
 // Mock data for listings
@@ -107,13 +114,28 @@ interface DisplayLead {
   isFromDatabase?: boolean;
 }
 
-// Mock data for leads with user account info and temperature
+// Mock data for leads with user account info and temperature - Mix of residential & commercial
 const mockLeads: DisplayLead[] = [
-  { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", source: "Lead Capture", status: "new", date: "2 hours ago", hasAccount: true, isVerified: false, financing: "pre-approved", temperature: "hot" },
-  { id: 2, name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", source: "Phone Call", status: "contacted", date: "5 hours ago", hasAccount: true, isVerified: true, financing: "cash", temperature: "hot" },
-  { id: 3, name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", source: "Contact Form", status: "qualified", date: "1 day ago", hasAccount: true, isVerified: false, financing: "working-with-lender", temperature: "warm" },
-  { id: 4, name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", source: "Lead Capture", status: "new", date: "1 day ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
-  { id: 5, name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", source: "Lead Capture", status: "converted", date: "2 days ago", hasAccount: true, isVerified: true, financing: "pre-qualified", temperature: "warm" },
+  // Hot leads - Ready to buy/invest
+  { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", source: "Chat Widget", status: "new", date: "2 hours ago", hasAccount: true, isVerified: false, financing: "pre-approved", temperature: "hot" },
+  { id: 2, name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", source: "AI Voice Call", status: "contacted", date: "5 hours ago", hasAccount: true, isVerified: true, financing: "cash", temperature: "hot" },
+  { id: 3, name: "Robert Martinez", email: "r.martinez@investco.com", phone: "(555) 111-2222", source: "Commercial Inquiry", status: "qualified", date: "Today", hasAccount: true, isVerified: true, financing: "cash", temperature: "hot" },
+  { id: 4, name: "Jennifer Lee", email: "jlee@realestate.net", phone: "(555) 333-4444", source: "Lead Capture", status: "new", date: "3 hours ago", hasAccount: true, isVerified: false, financing: "pre-approved", temperature: "hot" },
+
+  // Warm leads - Actively looking
+  { id: 5, name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", source: "Contact Form", status: "qualified", date: "1 day ago", hasAccount: true, isVerified: false, financing: "working-with-lender", temperature: "warm" },
+  { id: 6, name: "David Thompson", email: "dthompson@gmail.com", phone: "(555) 555-6666", source: "AI Voice Call", status: "contacted", date: "1 day ago", hasAccount: true, isVerified: true, financing: "pre-qualified", temperature: "warm" },
+  { id: 7, name: "Lisa Anderson", email: "lisa.a@yahoo.com", phone: "(555) 777-8888", source: "Chat Widget", status: "contacted", date: "2 days ago", hasAccount: true, isVerified: false, financing: "working-with-lender", temperature: "warm" },
+  { id: 8, name: "Kevin Park", email: "kpark@business.com", phone: "(555) 999-0000", source: "Commercial Inquiry", status: "qualified", date: "2 days ago", hasAccount: true, isVerified: true, financing: "business-loan", temperature: "warm" },
+  { id: 9, name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", source: "Lead Capture", status: "converted", date: "3 days ago", hasAccount: true, isVerified: true, financing: "pre-qualified", temperature: "warm" },
+
+  // Cold leads - Exploring
+  { id: 10, name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", source: "Lead Capture", status: "new", date: "3 days ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
+  { id: 11, name: "Maria Garcia", email: "mgarcia@outlook.com", phone: "(555) 222-3333", source: "Contact Form", status: "new", date: "4 days ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
+  { id: 12, name: "Thomas Wright", email: "twright@company.org", phone: "(555) 444-5555", source: "Commercial Inquiry", status: "contacted", date: "5 days ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
+  { id: 13, name: "Jessica Taylor", email: "jtaylor@mail.com", phone: "(555) 666-7777", source: "AI Voice Call", status: "new", date: "5 days ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
+  { id: 14, name: "Chris Robinson", email: "crobinson@email.net", phone: "(555) 888-9999", source: "Lead Capture", status: "contacted", date: "1 week ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
+  { id: 15, name: "Ashley Moore", email: "amoore@gmail.com", phone: "(555) 101-1111", source: "Chat Widget", status: "new", date: "1 week ago", hasAccount: true, isVerified: false, financing: "exploring", temperature: "cold" },
 ];
 
 // Helper to format relative time
@@ -150,31 +172,80 @@ function dbLeadToDisplay(lead: DbLead): DisplayLead {
   };
 }
 
-// Mock data for captured users
+// Mock data for captured users - Mix of residential & commercial clients
 const mockUsers = [
-  { id: "u1", name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", isVerified: false, totalInquiries: 3, lastActive: "2 hours ago", createdAt: "Today" },
-  { id: "u2", name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", isVerified: true, totalInquiries: 5, lastActive: "5 hours ago", createdAt: "Yesterday" },
-  { id: "u3", name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", isVerified: false, totalInquiries: 2, lastActive: "1 day ago", createdAt: "2 days ago" },
-  { id: "u4", name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", isVerified: false, totalInquiries: 1, lastActive: "1 day ago", createdAt: "3 days ago" },
-  { id: "u5", name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", isVerified: true, totalInquiries: 8, lastActive: "2 days ago", createdAt: "1 week ago" },
+  { id: "u1", name: "Sarah Johnson", email: "sarah.j@email.com", phone: "(555) 123-4567", isVerified: false, totalInquiries: 3, lastActive: "2 hours ago", createdAt: "Today", interest: "Residential - Oakwood" },
+  { id: "u2", name: "Michael Chen", email: "m.chen@email.com", phone: "(555) 234-5678", isVerified: true, totalInquiries: 5, lastActive: "5 hours ago", createdAt: "Yesterday", interest: "Residential - Downtown" },
+  { id: "u3", name: "Robert Martinez", email: "r.martinez@investco.com", phone: "(555) 111-2222", isVerified: true, totalInquiries: 12, lastActive: "Today", createdAt: "3 days ago", interest: "Commercial - Warehouse" },
+  { id: "u4", name: "Jennifer Lee", email: "jlee@realestate.net", phone: "(555) 333-4444", isVerified: false, totalInquiries: 2, lastActive: "3 hours ago", createdAt: "Today", interest: "Residential - Riverside" },
+  { id: "u5", name: "Emily Davis", email: "emily.d@email.com", phone: "(555) 345-6789", isVerified: false, totalInquiries: 2, lastActive: "1 day ago", createdAt: "2 days ago", interest: "Residential - Pine Ridge" },
+  { id: "u6", name: "David Thompson", email: "dthompson@gmail.com", phone: "(555) 555-6666", isVerified: true, totalInquiries: 4, lastActive: "1 day ago", createdAt: "3 days ago", interest: "Residential - Beachfront" },
+  { id: "u7", name: "Kevin Park", email: "kpark@business.com", phone: "(555) 999-0000", isVerified: true, totalInquiries: 8, lastActive: "2 days ago", createdAt: "1 week ago", interest: "Commercial - Retail Space" },
+  { id: "u8", name: "James Wilson", email: "j.wilson@email.com", phone: "(555) 456-7890", isVerified: false, totalInquiries: 1, lastActive: "3 days ago", createdAt: "4 days ago", interest: "Residential - Tech Park" },
+  { id: "u9", name: "Amanda Brown", email: "a.brown@email.com", phone: "(555) 567-8901", isVerified: true, totalInquiries: 8, lastActive: "3 days ago", createdAt: "2 weeks ago", interest: "Residential - Oakwood" },
+  { id: "u10", name: "Thomas Wright", email: "twright@company.org", phone: "(555) 444-5555", isVerified: false, totalInquiries: 3, lastActive: "5 days ago", createdAt: "1 week ago", interest: "Commercial - Office" },
 ];
 
-// Mock data for recent calls
+// Mock data for recent calls - Mix of residential & commercial
 const mockCalls = [
-  { id: 1, caller: "Unknown", duration: "3:24", sentiment: "positive", summary: "Looking for 3BR in downtown", date: "Today, 2:30 PM" },
-  { id: 2, caller: "Sarah Johnson", duration: "5:12", sentiment: "positive", summary: "Interested in lakefront property", date: "Today, 11:15 AM" },
-  { id: 3, caller: "Unknown", duration: "1:45", sentiment: "neutral", summary: "General inquiry about listings", date: "Yesterday, 4:45 PM" },
+  { id: 1, caller: "Robert Martinez", duration: "8:42", sentiment: "positive", summary: "Interested in warehouse property in Tech Park, cash buyer, wants to schedule viewing", date: "Today, 3:45 PM" },
+  { id: 2, caller: "Unknown", duration: "3:24", sentiment: "positive", summary: "Looking for 3BR under $400K in Riverside, pre-approved with lender", date: "Today, 2:30 PM" },
+  { id: 3, caller: "Sarah Johnson", duration: "5:12", sentiment: "positive", summary: "Follow-up on lakefront property in Oakwood, ready to make offer", date: "Today, 11:15 AM" },
+  { id: 4, caller: "Kevin Park", duration: "6:33", sentiment: "positive", summary: "Inquiring about retail space downtown, owns restaurant chain", date: "Today, 9:20 AM" },
+  { id: 5, caller: "Unknown", duration: "2:18", sentiment: "neutral", summary: "First-time buyer asking about starter homes under $300K", date: "Yesterday, 4:45 PM" },
+  { id: 6, caller: "Jennifer Lee", duration: "4:51", sentiment: "positive", summary: "Looking for 4BR family home in Riverside, needs good schools nearby", date: "Yesterday, 2:10 PM" },
+  { id: 7, caller: "Thomas Wright", duration: "7:15", sentiment: "neutral", summary: "Exploring office space options for expanding business, 5000+ sqft needed", date: "Yesterday, 10:30 AM" },
+  { id: 8, caller: "Unknown", duration: "1:45", sentiment: "neutral", summary: "General inquiry about commercial listings and investment properties", date: "2 days ago, 3:15 PM" },
+];
+
+// Mock tenants data
+const mockTenants = [
+  { id: "t1", name: "Marcus Johnson", email: "mjohnson@email.com", phone: "(555) 111-2222", property: "456 Riverside Dr, Unit 3A", rent: 1850, leaseEnd: "2025-08-31", status: "active" },
+  { id: "t2", name: "Lisa Chen", email: "lchen@email.com", phone: "(555) 333-4444", property: "789 Oakwood Lane, Unit 2B", rent: 2100, leaseEnd: "2025-06-30", status: "active" },
+  { id: "t3", name: "David Williams", email: "dwilliams@email.com", phone: "(555) 555-6666", property: "123 Downtown Plaza, Unit 5C", rent: 2450, leaseEnd: "2025-12-31", status: "active" },
+  { id: "t4", name: "Sarah Miller", email: "smiller@email.com", phone: "(555) 777-8888", property: "321 Tech Park Ave, Unit 1A", rent: 1950, leaseEnd: "2025-04-30", status: "active" },
+  { id: "t5", name: "James Rodriguez", email: "jrodriguez@email.com", phone: "(555) 999-0000", property: "555 Beachfront Blvd, Unit 4D", rent: 2800, leaseEnd: "2025-09-30", status: "active" },
+];
+
+// Mock invoices data
+const mockInvoices = [
+  { id: "inv1", invoiceNumber: "INV-202501-0001", tenant: "Marcus Johnson", property: "456 Riverside Dr, Unit 3A", description: "January 2025 Rent", amount: 1850, dueDate: "2025-01-01", status: "paid", paidDate: "2024-12-28" },
+  { id: "inv2", invoiceNumber: "INV-202501-0002", tenant: "Lisa Chen", property: "789 Oakwood Lane, Unit 2B", description: "January 2025 Rent", amount: 2100, dueDate: "2025-01-01", status: "paid", paidDate: "2025-01-02" },
+  { id: "inv3", invoiceNumber: "INV-202501-0003", tenant: "David Williams", property: "123 Downtown Plaza, Unit 5C", description: "January 2025 Rent", amount: 2450, dueDate: "2025-01-01", status: "overdue", paidDate: null },
+  { id: "inv4", invoiceNumber: "INV-202501-0004", tenant: "Sarah Miller", property: "321 Tech Park Ave, Unit 1A", description: "January 2025 Rent", amount: 1950, dueDate: "2025-01-01", status: "paid", paidDate: "2025-01-01" },
+  { id: "inv5", invoiceNumber: "INV-202501-0005", tenant: "James Rodriguez", property: "555 Beachfront Blvd, Unit 4D", description: "January 2025 Rent", amount: 2800, dueDate: "2025-01-01", status: "pending", paidDate: null },
+  { id: "inv6", invoiceNumber: "INV-202502-0001", tenant: "Marcus Johnson", property: "456 Riverside Dr, Unit 3A", description: "February 2025 Rent", amount: 1850, dueDate: "2025-02-01", status: "sent", paidDate: null },
+  { id: "inv7", invoiceNumber: "INV-202501-0006", tenant: "Lisa Chen", property: "789 Oakwood Lane, Unit 2B", description: "Late Fee - December", amount: 150, dueDate: "2025-01-15", status: "paid", paidDate: "2025-01-10" },
+];
+
+// Mock maintenance tickets
+const mockTickets = [
+  { id: "tkt1", ticketNumber: "TKT-202501-0001", tenant: "Marcus Johnson", property: "456 Riverside Dr, Unit 3A", category: "plumbing", priority: "high", title: "Leaking faucet in kitchen", status: "in_progress", createdAt: "2 hours ago", assignedTo: "Mike's Plumbing" },
+  { id: "tkt2", ticketNumber: "TKT-202501-0002", tenant: "Lisa Chen", property: "789 Oakwood Lane, Unit 2B", category: "hvac", priority: "medium", title: "AC not cooling properly", status: "scheduled", createdAt: "1 day ago", assignedTo: "Cool Air HVAC" },
+  { id: "tkt3", ticketNumber: "TKT-202501-0003", tenant: "David Williams", property: "123 Downtown Plaza, Unit 5C", category: "electrical", priority: "emergency", title: "Power outlet sparking", status: "open", createdAt: "30 min ago", assignedTo: null },
+  { id: "tkt4", ticketNumber: "TKT-202501-0004", tenant: "Sarah Miller", property: "321 Tech Park Ave, Unit 1A", category: "appliance", priority: "low", title: "Dishwasher making noise", status: "completed", createdAt: "3 days ago", assignedTo: "Appliance Pros" },
+  { id: "tkt5", ticketNumber: "TKT-202501-0005", tenant: "James Rodriguez", property: "555 Beachfront Blvd, Unit 4D", category: "structural", priority: "medium", title: "Crack in bathroom tile", status: "pending_parts", createdAt: "2 days ago", assignedTo: "BuildRight Contractors" },
+];
+
+// Mock payments data
+const mockPayments = [
+  { id: "pay1", tenant: "Marcus Johnson", invoice: "INV-202501-0001", amount: 1850, method: "card", date: "Dec 28, 2024", status: "completed" },
+  { id: "pay2", tenant: "Lisa Chen", invoice: "INV-202501-0002", amount: 2100, method: "bank_transfer", date: "Jan 2, 2025", status: "completed" },
+  { id: "pay3", tenant: "Sarah Miller", invoice: "INV-202501-0004", amount: 1950, method: "card", date: "Jan 1, 2025", status: "completed" },
+  { id: "pay4", tenant: "Lisa Chen", invoice: "INV-202501-0006", amount: 150, method: "card", date: "Jan 10, 2025", status: "completed" },
+  { id: "pay5", tenant: "James Rodriguez", invoice: "INV-202412-0005", amount: 2800, method: "check", date: "Dec 15, 2024", status: "completed" },
 ];
 
 const sidebarItems = [
   { name: "Dashboard", icon: LayoutDashboard, active: true },
   { name: "Listings", icon: Home, count: 24 },
   { name: "Leads", icon: Users, count: 47 },
-  { name: "Users", icon: Users, count: mockUsers.length, highlight: true },
+  { name: "Tenants", icon: Building, count: mockTenants.length },
+  { name: "Invoices", icon: FileText, count: mockInvoices.filter(i => i.status !== 'paid').length },
+  { name: "Payments", icon: DollarSign, count: mockPayments.length },
+  { name: "Maintenance", icon: Wrench, count: mockTickets.filter(t => t.status !== 'completed').length },
   { name: "Messages", icon: MessageSquare, count: 12 },
   { name: "Calls", icon: Phone, count: 8 },
-  { name: "Showings", icon: Calendar, count: 5 },
-  { name: "Analytics", icon: TrendingUp },
   { name: "Settings", icon: Settings },
 ];
 
@@ -256,11 +327,101 @@ const getFinancingLabel = (financing: string) => {
   }
 };
 
+const getInvoiceStatusBadge = (status: string) => {
+  switch (status) {
+    case "paid":
+      return <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center"><CheckCircle className="w-3 h-3 mr-1" />Paid</span>;
+    case "pending":
+      return <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">Pending</span>;
+    case "sent":
+      return <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full flex items-center"><Send className="w-3 h-3 mr-1" />Sent</span>;
+    case "overdue":
+      return <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full flex items-center"><AlertTriangle className="w-3 h-3 mr-1" />Overdue</span>;
+    case "cancelled":
+      return <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">Cancelled</span>;
+    default:
+      return <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">{status}</span>;
+  }
+};
+
+const getTicketStatusBadge = (status: string) => {
+  switch (status) {
+    case "open":
+      return <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">Open</span>;
+    case "in_progress":
+      return <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">In Progress</span>;
+    case "scheduled":
+      return <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex items-center"><Calendar className="w-3 h-3 mr-1" />Scheduled</span>;
+    case "pending_parts":
+      return <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">Pending Parts</span>;
+    case "completed":
+      return <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center"><CheckCircle className="w-3 h-3 mr-1" />Completed</span>;
+    default:
+      return <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">{status}</span>;
+  }
+};
+
+const getPriorityBadge = (priority: string) => {
+  switch (priority) {
+    case "emergency":
+      return <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">EMERGENCY</span>;
+    case "high":
+      return <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">High</span>;
+    case "medium":
+      return <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">Medium</span>;
+    case "low":
+      return <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">Low</span>;
+    default:
+      return <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">{priority}</span>;
+  }
+};
+
+const getCategoryIcon = (category: string) => {
+  switch (category) {
+    case "plumbing":
+      return "🔧";
+    case "electrical":
+      return "⚡";
+    case "hvac":
+      return "❄️";
+    case "appliance":
+      return "🔌";
+    case "structural":
+      return "🏗️";
+    case "pest":
+      return "🐛";
+    default:
+      return "🔨";
+  }
+};
+
+const getPaymentMethodIcon = (method: string) => {
+  switch (method) {
+    case "card":
+      return <CreditCard className="w-4 h-4 text-blue-500" />;
+    case "bank_transfer":
+      return <Building className="w-4 h-4 text-green-500" />;
+    case "check":
+      return <FileText className="w-4 h-4 text-gray-500" />;
+    default:
+      return <DollarSign className="w-4 h-4 text-gray-500" />;
+  }
+};
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [leads, setLeads] = useState<DisplayLead[]>(mockLeads);
   const [isLoadingLeads, setIsLoadingLeads] = useState(true);
+  const [deletingLeadId, setDeletingLeadId] = useState<string | number | null>(null);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceForm, setInvoiceForm] = useState({
+    tenant: "",
+    property: "",
+    description: "",
+    amount: "",
+    dueDate: "",
+  });
 
   // Fetch real leads from database
   useEffect(() => {
@@ -288,6 +449,36 @@ export default function AdminDashboard() {
     const interval = setInterval(fetchLeads, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  // Delete a lead (database leads only)
+  const handleDeleteLead = async (lead: DisplayLead) => {
+    if (!lead.isFromDatabase) {
+      // For mock leads, just remove from state
+      setLeads(prev => prev.filter(l => l.id !== lead.id));
+      return;
+    }
+
+    setDeletingLeadId(lead.id);
+    try {
+      const response = await fetch(`/api/leads?id=${lead.id}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        // Remove from state
+        setLeads(prev => prev.filter(l => l.id !== lead.id));
+      } else {
+        console.error('Failed to delete lead:', data.error);
+        alert('Failed to delete lead. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error deleting lead:', error);
+      alert('Failed to delete lead. Please try again.');
+    } finally {
+      setDeletingLeadId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -583,7 +774,7 @@ export default function AdminDashboard() {
               </div>
               <div className="divide-y divide-gray-100">
                 {leads.slice(0, 7).map((lead) => (
-                  <div key={lead.id} className="p-3 md:p-4 hover:bg-gray-50 transition-colors">
+                  <div key={lead.id} className="p-3 md:p-4 hover:bg-gray-50 transition-colors group">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
                         <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-medium text-xs md:text-sm flex-shrink-0 ${
@@ -608,7 +799,21 @@ export default function AdminDashboard() {
                           </p>
                         </div>
                       </div>
-                      <div className="flex-shrink-0">{getLeadStatusBadge(lead.status)}</div>
+                      <div className="flex items-center space-x-2 flex-shrink-0">
+                        {getLeadStatusBadge(lead.status)}
+                        <button
+                          onClick={() => handleDeleteLead(lead)}
+                          disabled={deletingLeadId === lead.id}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                          title="Delete lead"
+                        >
+                          {deletingLeadId === lead.id ? (
+                            <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -789,8 +994,373 @@ export default function AdminDashboard() {
               </table>
             </div>
           </div>
+
+          {/* Invoices Section */}
+          <div className="mt-4 md:mt-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="p-4 md:p-6 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-blue-100 flex items-center justify-center">
+                    <FileText className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-base md:text-lg font-bold text-gray-900">Invoices</h2>
+                    <p className="text-xs md:text-sm text-gray-500">Manage rent and fee invoices</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                    ${mockInvoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + i.amount, 0).toLocaleString()} collected
+                  </span>
+                  <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                    ${mockInvoices.filter(i => i.status === 'overdue').reduce((sum, i) => sum + i.amount, 0).toLocaleString()} overdue
+                  </span>
+                  <button
+                    onClick={() => setShowInvoiceModal(true)}
+                    className="flex items-center space-x-1 md:space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-blue-500 text-white rounded-lg text-xs md:text-sm font-medium hover:bg-blue-600 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Create Invoice</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Invoice Cards */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {mockInvoices.slice(0, 5).map((invoice) => (
+                <div key={invoice.id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">{invoice.tenant}</p>
+                      <p className="text-xs text-gray-500">{invoice.description}</p>
+                      <p className="text-xs text-gray-400">{invoice.invoiceNumber}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">${invoice.amount.toLocaleString()}</p>
+                      {getInvoiceStatusBadge(invoice.status)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Invoice Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tenant</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {mockInvoices.map((invoice) => (
+                    <tr key={invoice.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <p className="text-sm font-medium text-gray-900">{invoice.invoiceNumber}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-sm text-gray-900">{invoice.tenant}</p>
+                        <p className="text-xs text-gray-500">{invoice.property}</p>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{invoice.description}</td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-semibold text-gray-900">${invoice.amount.toLocaleString()}</span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{invoice.dueDate}</td>
+                      <td className="px-6 py-4">{getInvoiceStatusBadge(invoice.status)}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
+                          <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Send">
+                            <Send className="w-4 h-4" />
+                          </button>
+                          <button className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="View">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Maintenance Tickets Section */}
+          <div className="mt-4 md:mt-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="p-4 md:p-6 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-orange-100 flex items-center justify-center">
+                    <Wrench className="w-4 h-4 md:w-5 md:h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-base md:text-lg font-bold text-gray-900">Maintenance Tickets</h2>
+                    <p className="text-xs md:text-sm text-gray-500">Track repair requests from tenants</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                    {mockTickets.filter(t => t.priority === 'emergency').length} Emergency
+                  </span>
+                  <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
+                    {mockTickets.filter(t => t.status === 'open').length} Open
+                  </span>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                    {mockTickets.filter(t => t.status === 'in_progress').length} In Progress
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Ticket Cards */}
+            <div className="divide-y divide-gray-100">
+              {mockTickets.map((ticket) => (
+                <div key={ticket.id} className={`p-4 hover:bg-gray-50 ${ticket.priority === 'emergency' ? 'bg-red-50' : ''}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start space-x-3">
+                      <span className="text-2xl">{getCategoryIcon(ticket.category)}</span>
+                      <div>
+                        <div className="flex items-center space-x-2 flex-wrap gap-1">
+                          <p className="font-medium text-gray-900 text-sm">{ticket.title}</p>
+                          {getPriorityBadge(ticket.priority)}
+                          {getTicketStatusBadge(ticket.status)}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">{ticket.tenant} • {ticket.property}</p>
+                        <p className="text-xs text-gray-400">#{ticket.ticketNumber} • {ticket.createdAt}</p>
+                        {ticket.assignedTo && (
+                          <p className="text-xs text-blue-600 mt-1">Assigned to: {ticket.assignedTo}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="View Details">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Payments Section */}
+          <div className="mt-4 md:mt-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="p-4 md:p-6 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-green-100 flex items-center justify-center">
+                    <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-base md:text-lg font-bold text-gray-900">Recent Payments</h2>
+                    <p className="text-xs md:text-sm text-gray-500">Track payment history</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                    ${mockPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()} total
+                  </span>
+                  <button className="flex items-center space-x-2 px-3 py-1.5 md:py-2 text-gray-600 hover:bg-gray-50 rounded-lg text-xs md:text-sm">
+                    <Download className="w-4 h-4" />
+                    <span>Export</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment List */}
+            <div className="divide-y divide-gray-100">
+              {mockPayments.map((payment) => (
+                <div key={payment.id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      {getPaymentMethodIcon(payment.method)}
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm">{payment.tenant}</p>
+                        <p className="text-xs text-gray-500">{payment.invoice} • {payment.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className="font-semibold text-green-600">+${payment.amount.toLocaleString()}</span>
+                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        {payment.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tenants Section */}
+          <div className="mt-4 md:mt-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="p-4 md:p-6 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-purple-100 flex items-center justify-center">
+                    <Building className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-base md:text-lg font-bold text-gray-900">Tenants</h2>
+                    <p className="text-xs md:text-sm text-gray-500">Manage property tenants</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                    {mockTenants.length} Active Tenants
+                  </span>
+                  <button className="flex items-center space-x-1 md:space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-purple-500 text-white rounded-lg text-xs md:text-sm font-medium hover:bg-purple-600 transition-colors">
+                    <Plus className="w-4 h-4" />
+                    <span>Add Tenant</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Tenant Cards */}
+            <div className="divide-y divide-gray-100">
+              {mockTenants.map((tenant) => (
+                <div key={tenant.id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white font-medium text-sm">
+                        {tenant.name.split(" ").map(n => n[0]).join("")}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm">{tenant.name}</p>
+                        <p className="text-xs text-gray-500">{tenant.property}</p>
+                        <p className="text-xs text-gray-400">{tenant.email} • {tenant.phone}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">${tenant.rent.toLocaleString()}/mo</p>
+                      <p className="text-xs text-gray-500">Lease ends: {tenant.leaseEnd}</p>
+                      <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">{tenant.status}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Client Portal Link */}
+          <div className="mt-4 md:mt-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl p-6 text-white">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold">Tenant Portal</h3>
+                <p className="text-sm text-emerald-100">Share this link with tenants to submit maintenance requests and view their invoices</p>
+              </div>
+              <Link
+                href="/demo/portal"
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-white text-emerald-600 rounded-lg font-medium hover:bg-emerald-50 transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                <span>View Portal</span>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Create Invoice Modal */}
+      {showInvoiceModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Create Invoice</h3>
+                <button
+                  onClick={() => setShowInvoiceModal(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tenant</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={invoiceForm.tenant}
+                  onChange={(e) => setInvoiceForm({...invoiceForm, tenant: e.target.value})}
+                >
+                  <option value="">Select tenant...</option>
+                  {mockTenants.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name} - {t.property}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input
+                  type="text"
+                  placeholder="e.g., February 2025 Rent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={invoiceForm.description}
+                  onChange={(e) => setInvoiceForm({...invoiceForm, description: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={invoiceForm.amount}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, amount: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value={invoiceForm.dueDate}
+                    onChange={(e) => setInvoiceForm({...invoiceForm, dueDate: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowInvoiceModal(false)}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  alert('Invoice created! (Demo mode)');
+                  setShowInvoiceModal(false);
+                  setInvoiceForm({ tenant: "", property: "", description: "", amount: "", dueDate: "" });
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600"
+              >
+                Create Invoice
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

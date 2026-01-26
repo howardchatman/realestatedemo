@@ -9,7 +9,16 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(git fetch:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(ping:*)",
+      "Bash(dir:*)",
+      "Bash(copy:*)",
+      "Bash(ls -la \"c:\\\\Users\\\\howar\\\\Downloads\\\\real-estate-demo\\\\src\\\\app\"\" | grep -E \"^d \")",
+      "Bash(npm install:*)",
+      "Bash(npx supabase:*)",
+      "Bash(where:*)",
+      "Bash(vercel:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

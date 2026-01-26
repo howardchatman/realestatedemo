@@ -335,7 +335,7 @@ const listings = [
     beds: 0,
     baths: 2,
     sqft: 3200,
-    image: "https://images.unsplash.com/photo-1565620731358-e8c038abc8d1?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=600&q=80",
     tag: "Gas Station",
     tagColor: "bg-yellow-600",
     isCommercial: true,

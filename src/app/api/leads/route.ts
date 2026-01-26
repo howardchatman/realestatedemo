@@ -121,3 +121,49 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// DELETE endpoint to remove a lead
+export async function DELETE(request: NextRequest) {
+  try {
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database not configured' },
+        { status: 500 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: 'Lead ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabase
+      .from('leads')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting lead:', error);
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to delete lead',
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Lead deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error in delete leads API:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete lead' },
+      { status: 500 }
+    );
+  }
+}

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, Home, DollarSign, BedDouble, ChevronDown } from "lucide-react";
+import { Search, MapPin, Home, DollarSign, BedDouble, ChevronDown, TrendingUp } from "lucide-react";
+import { useValuation } from "@/hooks/useValuation";
+import ValuationLeadModal from "./ValuationLeadModal";
 
 export default function Hero() {
   const router = useRouter();
@@ -11,6 +13,37 @@ export default function Hero() {
   const [propertyType, setPropertyType] = useState("");
   const [priceRange, setPriceRange] = useState("");
   const [bedrooms, setBedrooms] = useState("");
+
+  // Valuation state
+  const [sellAddress, setSellAddress] = useState("");
+  const [showValuationModal, setShowValuationModal] = useState(false);
+  const {
+    valuation,
+    isLoading: isValuationLoading,
+    error: valuationError,
+    fetchValuation,
+    submitWithLead,
+    reset: resetValuation,
+  } = useValuation();
+
+  const handleGetValuation = async () => {
+    if (sellAddress.trim()) {
+      const result = await fetchValuation(sellAddress);
+      if (result) {
+        // Auto-open modal after showing results briefly
+        setTimeout(() => setShowValuationModal(true), 1500);
+      }
+    }
+  };
+
+  const handleValuationLeadSubmit = async (leadData: { name: string; email: string; phone: string }) => {
+    return await submitWithLead(leadData);
+  };
+
+  const handleResetValuation = () => {
+    resetValuation();
+    setSellAddress("");
+  };
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -149,25 +182,86 @@ export default function Hero() {
             ) : (
               <>
                 {/* Sell - Home Valuation */}
-                <div className="text-center py-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    What&apos;s Your Home Worth?
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Get a free, instant home valuation powered by AI
-                  </p>
-                  <div className="relative mb-4">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Enter your property address"
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
+                {!valuation ? (
+                  <div className="text-center py-4">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      What&apos;s Your Home Worth?
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Get a free, instant home valuation powered by AI
+                    </p>
+                    <div className="relative mb-4">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Enter your property address"
+                        value={sellAddress}
+                        onChange={(e) => setSellAddress(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleGetValuation()}
+                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      />
+                    </div>
+                    {valuationError && (
+                      <p className="text-red-500 text-sm mb-3">{valuationError}</p>
+                    )}
+                    <button
+                      onClick={handleGetValuation}
+                      disabled={isValuationLoading || !sellAddress.trim()}
+                      className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-emerald-500/25 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                    >
+                      {isValuationLoading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Analyzing Market Data...</span>
+                        </>
+                      ) : (
+                        <span>Get Free Valuation</span>
+                      )}
+                    </button>
                   </div>
-                  <button className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-emerald-500/25 transition-all">
-                    Get Free Valuation
-                  </button>
-                </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-500 mb-1">Estimated Value</p>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">
+                      {valuation.formatted.estimated}
+                    </div>
+                    <div className="flex items-center justify-center gap-1 text-emerald-600 text-sm font-medium mb-4">
+                      <TrendingUp className="w-4 h-4" />
+                      <span>{valuation.formatted.trend} from last year</span>
+                    </div>
+                    <div className="flex justify-center gap-4 text-sm text-gray-600 mb-4">
+                      <span>Low: {valuation.formatted.low}</span>
+                      <span className="text-gray-300">|</span>
+                      <span>High: {valuation.formatted.high}</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-4">
+                      Based on {valuation.comparable_count} similar properties
+                    </p>
+                    <button
+                      onClick={() => setShowValuationModal(true)}
+                      className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
+                    >
+                      Get Full Report Free
+                    </button>
+                    <button
+                      onClick={handleResetValuation}
+                      className="mt-3 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      Try another address
+                    </button>
+                  </div>
+                )}
+
+                {/* Valuation Lead Modal */}
+                {valuation && (
+                  <ValuationLeadModal
+                    isOpen={showValuationModal}
+                    onClose={() => setShowValuationModal(false)}
+                    onSubmit={handleValuationLeadSubmit}
+                    valuation={valuation}
+                    address={sellAddress}
+                  />
+                )}
               </>
             )}
           </div>
