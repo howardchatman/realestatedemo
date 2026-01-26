@@ -34,11 +34,11 @@ const footerLinks = {
     { name: "Careers", href: "/about" },
   ],
   resources: [
-    { name: "Mortgage Calculator", href: "/#contact" },
-    { name: "Buying Guide", href: "/listings" },
-    { name: "Selling Guide", href: "/#valuation" },
+    { name: "Mortgage Calculator", href: "/resources/mortgage-calculator" },
+    { name: "Buying Guide", href: "/resources/buying-guide" },
+    { name: "Selling Guide", href: "/resources/selling-guide" },
     { name: "Blog", href: "/about" },
-    { name: "FAQ", href: "/#contact" },
+    { name: "FAQ", href: "/resources/faq" },
   ],
 };
 
