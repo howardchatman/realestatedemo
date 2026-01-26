@@ -238,16 +238,16 @@ const mockPayments = [
 ];
 
 const sidebarItems = [
-  { name: "Dashboard", icon: LayoutDashboard, active: true },
-  { name: "Listings", icon: Home, count: 24 },
-  { name: "Leads", icon: Users, count: 47 },
-  { name: "Tenants", icon: Building, count: mockTenants.length },
-  { name: "Invoices", icon: FileText, count: mockInvoices.filter(i => i.status !== 'paid').length },
-  { name: "Payments", icon: DollarSign, count: mockPayments.length },
-  { name: "Maintenance", icon: Wrench, count: mockTickets.filter(t => t.status !== 'completed').length },
-  { name: "Messages", icon: MessageSquare, count: 12 },
-  { name: "Calls", icon: Phone, count: 8 },
-  { name: "Settings", icon: Settings },
+  { name: "Dashboard", icon: LayoutDashboard, href: "/demo/admin", active: true },
+  { name: "Listings", icon: Home, href: "/demo/admin/listings", count: 24 },
+  { name: "Leads", icon: Users, href: "/demo/admin/leads", count: 47 },
+  { name: "Tenants", icon: Building, href: "/demo/admin/tenants", count: mockTenants.length },
+  { name: "Invoices", icon: FileText, href: "/demo/admin/invoices", count: mockInvoices.filter(i => i.status !== 'paid').length },
+  { name: "Payments", icon: DollarSign, href: "/demo/admin/payments", count: mockPayments.length },
+  { name: "Maintenance", icon: Wrench, href: "/demo/admin/maintenance", count: mockTickets.filter(t => t.status !== 'completed').length },
+  { name: "Messages", icon: MessageSquare, href: "/demo/admin/messages", count: 12 },
+  { name: "Calls", icon: Phone, href: "/demo/admin/calls", count: 8 },
+  { name: "Settings", icon: Settings, href: "/demo/admin/settings" },
 ];
 
 const formatPrice = (price: number) => {
@@ -552,8 +552,9 @@ export default function AdminDashboard() {
             </div>
 
             {sidebarItems.map((item) => (
-              <button
+              <Link
                 key={item.name}
+                href={item.href}
                 onClick={() => setSidebarOpen(false)}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg mb-1 transition-colors ${
                   item.active
@@ -572,7 +573,7 @@ export default function AdminDashboard() {
                     {item.count}
                   </span>
                 )}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
