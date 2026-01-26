@@ -80,10 +80,10 @@ function ApplicationModal({
           <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                Apply for Platform Access
+                Apply for Your Own Platform
               </h2>
               <p className="text-sm text-gray-500">
-                Limited access. Applications reviewed.
+                Get your own branded real estate platform.
               </p>
             </div>
             <button
@@ -332,8 +332,8 @@ function HeroSection({ onApply }: { onApply: () => void }) {
           </h1>
 
           <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Chatman RP handles calls, follows up with leads, and tells you exactly
-            who needs your attention — so you can focus on closing deals.
+            Get your own AI-powered real estate platform that handles calls, follows up with leads,
+            and tells you exactly who needs your attention — so you can focus on closing deals.
           </p>
 
           <div className="flex flex-col items-center">
@@ -341,10 +341,10 @@ function HeroSection({ onApply }: { onApply: () => void }) {
               onClick={onApply}
               className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-emerald-500/30 transition-all transform hover:scale-105"
             >
-              Apply for Platform Access
+              Apply for Your Own Platform
             </button>
             <p className="text-gray-500 text-sm mt-3">
-              Built as infrastructure — not another tool.
+              Your brand. Your leads. Your platform.
             </p>
             <Link
               href="/demo"
@@ -715,18 +715,18 @@ function FinalCtaSection({ onApply }: { onApply: () => void }) {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-8">
-            Ready to stop chasing and start converting?
+            Ready to get your own platform?
           </h2>
 
           <button
             onClick={onApply}
             className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-emerald-500/30 transition-all transform hover:scale-105"
           >
-            Apply for Platform Access
+            Apply for Your Own Platform
           </button>
 
           <p className="text-gray-500 text-sm mt-4">
-            Limited access. Applications reviewed.
+            Your own branded platform. Limited spots available.
           </p>
         </motion.div>
       </div>
