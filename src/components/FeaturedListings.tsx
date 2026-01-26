@@ -321,7 +321,7 @@ const listings = [
     beds: 0,
     baths: 1,
     sqft: 25000,
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+    image: "/images/storage_image.png",
     tag: "Storage",
     tagColor: "bg-orange-600",
     isCommercial: true,
