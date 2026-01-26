@@ -251,7 +251,7 @@ const listings = [
     beds: 0,
     baths: 6,
     sqft: 28000,
-    image: "https://images.unsplash.com/photo-1567449303078-57ad995bd329?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=600&q=80",
     tag: "Shopping Center",
     tagColor: "bg-fuchsia-600",
     isCommercial: true,

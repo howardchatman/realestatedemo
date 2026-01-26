@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, Phone, Search, Heart, ChevronDown, LayoutDashboard, Users } from "lucide-react";
+import { Menu, X, Phone, Search, Heart, ChevronDown, LayoutDashboard, Users, LogIn } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
@@ -129,6 +129,13 @@ export default function Navbar() {
               <span className="font-medium">(832) 770-7998</span>
             </a>
             <Link
+              href="/demo/login"
+              className="flex items-center space-x-2 px-4 py-2.5 text-gray-600 hover:text-emerald-600 border border-gray-200 hover:border-emerald-200 rounded-lg font-medium transition-all"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Sign In</span>
+            </Link>
+            <Link
               href="/schedule"
               className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
             >
@@ -193,6 +200,14 @@ export default function Navbar() {
                 <Phone className="w-4 h-4" />
                 <span className="font-medium">(832) 770-7998</span>
               </a>
+              <Link
+                href="/demo/login"
+                className="flex items-center justify-center space-x-2 px-6 py-3 border border-gray-200 text-gray-700 rounded-lg font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign In</span>
+              </Link>
               <Link
                 href="/schedule"
                 className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium"
