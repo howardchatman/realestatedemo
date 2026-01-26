@@ -33,6 +33,20 @@ const DEMO_ACCOUNTS = {
     role: "Property Manager",
     redirect: "/demo/admin",
   },
+  howard: {
+    email: "howard@chatmaninc.com",
+    password: "Howard1234",
+    name: "Howard Chatman",
+    role: "Admin",
+    redirect: "/demo/admin",
+  },
+  ecko: {
+    email: "ecko@chatmaninc.com",
+    password: "Ecko1234",
+    name: "Ecko",
+    role: "Admin",
+    redirect: "/demo/admin",
+  },
 };
 
 export default function LoginPage() {
@@ -52,23 +66,17 @@ export default function LoginPage() {
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Check credentials
-    const tenantMatch =
-      email.toLowerCase() === DEMO_ACCOUNTS.tenant.email &&
-      password === DEMO_ACCOUNTS.tenant.password;
-    const adminMatch =
-      email.toLowerCase() === DEMO_ACCOUNTS.admin.email &&
-      password === DEMO_ACCOUNTS.admin.password;
+    // Check credentials against all accounts
+    const matchedAccount = Object.values(DEMO_ACCOUNTS).find(
+      (account) =>
+        email.toLowerCase() === account.email.toLowerCase() &&
+        password === account.password
+    );
 
-    if (tenantMatch) {
-      setLoginSuccess(DEMO_ACCOUNTS.tenant.name);
+    if (matchedAccount) {
+      setLoginSuccess(matchedAccount.name);
       setTimeout(() => {
-        router.push(DEMO_ACCOUNTS.tenant.redirect);
-      }, 1500);
-    } else if (adminMatch) {
-      setLoginSuccess(DEMO_ACCOUNTS.admin.name);
-      setTimeout(() => {
-        router.push(DEMO_ACCOUNTS.admin.redirect);
+        router.push(matchedAccount.redirect);
       }, 1500);
     } else {
       setError("Invalid email or password. Try the demo credentials below.");
