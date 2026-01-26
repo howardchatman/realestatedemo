@@ -34,6 +34,7 @@ import {
   Send,
   CreditCard,
   Building,
+  Sparkles,
 } from "lucide-react";
 
 // Mock data for listings
@@ -1270,6 +1271,23 @@ export default function AdminDashboard() {
               >
                 <Eye className="w-4 h-4" />
                 <span>View Portal</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* AI Listing Writer Link */}
+          <div className="mt-4 md:mt-6 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl p-6 text-white">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold">AI Listing Writer</h3>
+                <p className="text-sm text-violet-100">Generate compelling property descriptions with AI in seconds</p>
+              </div>
+              <Link
+                href="/demo/ai-writer"
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-white text-violet-600 rounded-lg font-medium hover:bg-violet-50 transition-colors"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Open AI Writer</span>
               </Link>
             </div>
           </div>
