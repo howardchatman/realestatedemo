@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft,
   Sparkles,
@@ -11,6 +12,11 @@ import {
   Check,
   RefreshCw,
   Wand2,
+  Upload,
+  X,
+  ImageIcon,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 
 interface PropertyDetails {
@@ -77,6 +83,72 @@ export default function AIWriterPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [photos, setPhotos] = useState<{ file: File; preview: string }[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
+  const [listingCreated, setListingCreated] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newPhotos = Array.from(files).map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+
+    setPhotos((prev) => [...prev, ...newPhotos].slice(0, 10)); // Max 10 photos
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos((prev) => {
+      const newPhotos = [...prev];
+      URL.revokeObjectURL(newPhotos[index].preview);
+      newPhotos.splice(index, 1);
+      return newPhotos;
+    });
+  };
+
+  const validateListing = (): string[] => {
+    const errors: string[] = [];
+    if (!propertyDetails.address.trim()) errors.push("Address is required");
+    if (!propertyDetails.price.trim()) errors.push("Price is required");
+    if (!propertyDetails.bedrooms.trim() && propertyDetails.propertyType !== "Land" && propertyDetails.propertyType !== "Commercial") {
+      errors.push("Bedrooms is required");
+    }
+    if (!propertyDetails.bathrooms.trim() && propertyDetails.propertyType !== "Land") {
+      errors.push("Bathrooms is required");
+    }
+    if (!propertyDetails.squareFootage.trim() && propertyDetails.propertyType !== "Land") {
+      errors.push("Square footage is required");
+    }
+    if (photos.length === 0) errors.push("At least 1 photo is required");
+    if (!generatedDescription) errors.push("Generate a description first");
+    return errors;
+  };
+
+  const handleCreateListing = async () => {
+    const errors = validateListing();
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    setValidationErrors([]);
+    setIsCreating(true);
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setIsCreating(false);
+    setListingCreated(true);
+
+    // Reset after showing success
+    setTimeout(() => {
+      setListingCreated(false);
+    }, 3000);
+  };
 
   const toggleFeature = (feature: string) => {
     setPropertyDetails((prev) => ({
@@ -359,61 +431,167 @@ export default function AIWriterPage() {
             </div>
           </div>
 
-          {/* Output */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                Generated Description
+          {/* Right Column - Photos & Output */}
+          <div className="space-y-6">
+            {/* Photo Upload Section */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-emerald-600" />
+                Listing Photos
+                <span className="text-sm font-normal text-gray-500">(at least 1 required)</span>
               </h2>
-              {generatedDescription && (
-                <button
-                  onClick={handleCopy}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 text-emerald-600" />
-                      <span className="text-emerald-600">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
+
+              {/* Upload Area */}
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition-all"
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+                <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600 font-medium">Click to upload photos</p>
+                <p className="text-sm text-gray-400 mt-1">PNG, JPG up to 10MB each (max 10 photos)</p>
+              </div>
+
+              {/* Photo Previews */}
+              {photos.length > 0 && (
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {photos.map((photo, index) => (
+                    <div key={index} className="relative group aspect-square">
+                      <Image
+                        src={photo.preview}
+                        alt={`Property photo ${index + 1}`}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                      {index === 0 && (
+                        <span className="absolute top-2 left-2 px-2 py-0.5 bg-emerald-500 text-white text-xs font-medium rounded">
+                          Cover
+                        </span>
+                      )}
+                      <button
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
+              <p className="text-sm text-gray-500 mt-3">
+                {photos.length}/10 photos uploaded
+              </p>
             </div>
 
-            {generatedDescription ? (
-              <div className="prose prose-gray max-w-none">
-                <div className="bg-gray-50 rounded-xl p-6 whitespace-pre-wrap text-gray-700 leading-relaxed">
-                  {generatedDescription}
-                </div>
-
-                <div className="mt-4 flex items-center gap-4">
+            {/* Generated Description */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  Generated Description
+                </h2>
+                {generatedDescription && (
                   <button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors disabled:opacity-70"
+                    onClick={handleCopy}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <RefreshCw className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`} />
-                    Regenerate
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span className="text-emerald-600">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>Copy</span>
+                      </>
+                    )}
                   </button>
+                )}
+              </div>
+
+              {generatedDescription ? (
+                <div className="prose prose-gray max-w-none">
+                  <div className="bg-gray-50 rounded-xl p-6 whitespace-pre-wrap text-gray-700 leading-relaxed">
+                    {generatedDescription}
+                  </div>
+
+                  <div className="mt-4 flex items-center gap-4">
+                    <button
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors disabled:opacity-70"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`} />
+                      Regenerate
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="h-64 flex flex-col items-center justify-center text-gray-400">
-                <Sparkles className="w-12 h-12 mb-4 opacity-50" />
-                <p className="text-center">
-                  Fill in the property details and click
-                  <br />
-                  <strong>&quot;Generate Description&quot;</strong> to create your listing
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="h-48 flex flex-col items-center justify-center text-gray-400">
+                  <Sparkles className="w-12 h-12 mb-4 opacity-50" />
+                  <p className="text-center">
+                    Fill in the property details and click
+                    <br />
+                    <strong>&quot;Generate Description&quot;</strong> to create your listing
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Validation Errors */}
+        {validationErrors.length > 0 && (
+          <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-red-800">Please fix the following errors:</h4>
+                <ul className="mt-2 space-y-1">
+                  {validationErrors.map((error, index) => (
+                    <li key={index} className="text-sm text-red-600">• {error}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Create Listing Button */}
+        <div className="mt-8">
+          {listingCreated ? (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center">
+              <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-emerald-800">Listing Created Successfully!</h3>
+              <p className="text-emerald-600 mt-1">Your property listing has been saved and is ready for review.</p>
+            </div>
+          ) : (
+            <button
+              onClick={handleCreateListing}
+              disabled={isCreating}
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-lg flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-emerald-500/25 transition-all disabled:opacity-70"
+            >
+              {isCreating ? (
+                <>
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  <span>Creating Listing...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  <span>Create Listing</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Tips */}
