@@ -728,6 +728,14 @@ function FinalCtaSection({ onApply }: { onApply: () => void }) {
           <p className="text-gray-500 text-sm mt-4">
             Your own branded platform. Limited spots available.
           </p>
+
+          <Link
+            href="/demo"
+            className="mt-6 inline-flex items-center text-gray-400 hover:text-emerald-400 transition-colors text-sm"
+          >
+            See How It Works
+            <ArrowRight className="w-4 h-4 ml-1" />
+          </Link>
         </motion.div>
       </div>
     </section>
