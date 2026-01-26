@@ -721,7 +721,7 @@ export default function AIVAChat() {
         sender: "ai",
         text: `Perfect! I've reserved ${date} at ${time} for your showing. You'll receive a confirmation email shortly with all the details. Is there anything else I can help you with?`,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        options: ["View more listings", "Get directions", "That's all, thanks!"],
+        options: ["View more listings", "That's all, thanks!"],
       };
       setIsTyping(false);
       setMessages((prev) => [...prev, confirmMessage]);
