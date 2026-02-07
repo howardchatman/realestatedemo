@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import AdminLayout from "@/components/AdminLayout";
 import {
   FileText,
@@ -171,10 +172,13 @@ export default function InvoicesPage() {
               <option value="sent">Sent</option>
               <option value="overdue">Overdue</option>
             </select>
-            <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+            <Link
+              href="/demo/admin/invoices/create"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+            >
               <Plus className="w-4 h-4" />
               <span>Create Invoice</span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>

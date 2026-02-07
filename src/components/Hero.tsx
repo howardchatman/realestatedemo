@@ -55,14 +55,29 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center">
-      {/* Background Image */}
+    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      {/* Background Video */}
       <div className="absolute inset-0">
-        <img
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
-          alt="Luxury home"
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
           className="w-full h-full object-cover"
-        />
+          poster="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
+        >
+          {/* Free stock video of luxury homes/neighborhoods */}
+          <source
+            src="https://videos.pexels.com/video-files/3773486/3773486-uhd_2560_1440_30fps.mp4"
+            type="video/mp4"
+          />
+          {/* Fallback image if video doesn't load */}
+          <img
+            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
+            alt="Luxury home"
+            className="w-full h-full object-cover"
+          />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
       </div>
 
